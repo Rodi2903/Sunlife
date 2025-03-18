@@ -24,6 +24,32 @@
             text-align: center;
             border-radius: 8px 8px 0 0;
         }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: inline-block;
+            width: 200px;
+            font-weight: bold;
+        }
+        .form-control {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 250px;
+        }
+        button {
+            background: #1e3a63;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #15294a;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -32,96 +58,508 @@
         th, td {
             padding: 10px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            border: 1px solid #ddd;
         }
         th {
             background: #1e3a63;
             color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #e6f2ff;
+        }
+        .account-summary {
+            background-color: #d6e9ff;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        .account-summary h3 {
+            text-align: center;
+            margin-top: 0;
+            background-color: #a3c9ff;
+            padding: 5px;
+        }
+        .summary-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .summary-label {
+            width: 50%;
+            font-weight: bold;
+        }
+        .summary-value {
+            width: 50%;
+            text-align: right;
+            font-weight: bold;
+        }
+        .paid {
+            color: green;
+            font-weight: bold;
+        }
+        .not-paid {
+            color: red;
+            font-weight: bold;
+        }
+        .partial-paid {
+            color: orange;
+            font-weight: bold;
+        }
+        .future-due {
+            font-style: italic;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h2>Statement of Account</h2>
+            <h2>Statement of Account Generator</h2>
         </div>
 
-        <label>Policy Anniversary: <input type="date" id="policyAnniversary"></label><br><br>
-        <label>Total Paid for Whole Duration: <input type="number" id="totalPaid"></label><br><br>
-        <label>Premium Amount: <input type="number" id="premiumAmount"></label><br><br>
-        <label>Mode of Payment: 
-            <select id="modeOfPayment">
-                <option value="yearly">Yearly</option>
+        <!-- Commented out as not used for computation
+        <div class="form-group">
+            <label>Client Name:</label>
+            <input type="text" id="clientName" class="form-control">
+        </div>
+        <div class="form-group">
+            <label>Plan:</label>
+            <input type="text" id="planName" class="form-control">
+        </div>
+        <div class="form-group">
+            <label>Policy No:</label>
+            <input type="text" id="policyNo" class="form-control">
+        </div>
+        -->
+        
+        <div class="form-group">
+            <label>Policy Anniversary:</label>
+            <input type="date" id="policyAnniversary" class="form-control">
+        </div>
+        <div class="form-group">
+            <label>Total Paid for Whole Duration:</label>
+            <input type="number" id="totalPaid" class="form-control">
+        </div>
+        <div class="form-group">
+            <label>Premium Amount:</label>
+            <input type="number" id="premiumAmount" class="form-control">
+        </div>
+        <div class="form-group">
+            <label>Mode of Payment:</label>
+            <select id="modeOfPayment" class="form-control">
+                <option value="annual">Annual</option>
                 <option value="quarterly">Quarterly</option>
                 <option value="monthly">Monthly</option>
             </select>
-        </label><br><br>
+        </div>
+        <div class="form-group">
+            <label>Current Date:</label>
+            <input type="date" id="currentDate" class="form-control">
+        </div>
 
+        <!-- Commented out as not used for computation
+        <div class="form-group">
+            <label>Upload Image:</label>
+            <input type="file" id="imageUpload" accept="image/*" class="form-control">
+        </div>
+
+        <button onclick="extractFromImage()">Extract from Image</button>
+        -->
+        
         <button onclick="generateSOA()">Generate Statement</button>
 
-        <div id="output"></div>
+        <div id="output" style="margin-top: 30px;"></div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js"></script>
     <script>
+        // Set current date as default
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            document.getElementById('currentDate').value = formatDateForInput(today);
+        });
+
+        function formatDateForInput(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        function formatDate(date) {
+            const day = date.getDate().toString().padStart(2, '0');
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const month = monthNames[date.getMonth()];
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`;
+        }
+
+        function formatDisplayDate(date) {
+            const day = date.getDate();
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const month = monthNames[date.getMonth()];
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`;
+        }
+
+        /* Commented out as not used for computation
+        function extractFromImage() {
+            const imageInput = document.getElementById('imageUpload');
+            if (!imageInput.files.length) {
+                alert('Please upload an image.');
+                return;
+            }
+
+            const file = imageInput.files[0];
+            Tesseract.recognize(file, 'eng', {
+                logger: m => console.log(m)
+            }).then(({ data: { text } }) => {
+                console.log('Extracted Text:', text);
+
+                // Extract client name
+                const clientNameMatch = text.match(/CLIENT'S NAME:\s*([^\n]+)/);
+                if (clientNameMatch) {
+                    document.getElementById('clientName').value = clientNameMatch[1].trim();
+                }
+
+                // Extract plan name
+                const planMatch = text.match(/Plan:\s*([^\n]+)/);
+                if (planMatch) {
+                    document.getElementById('planName').value = planMatch[1].trim();
+                }
+
+                // Extract policy number
+                const policyNoMatch = text.match(/Policy No:\s*([0-9]+)/);
+                if (policyNoMatch) {
+                    document.getElementById('policyNo').value = policyNoMatch[1].trim();
+                }
+
+                // Extract policy anniversary
+                const policyAnniversaryMatch = text.match(/Policy Anniversary:\s*([A-Za-z]+)\s*(\d{1,2}),?\s*(\d{4})/);
+                if (policyAnniversaryMatch) {
+                    const month = getMonthNumber(policyAnniversaryMatch[1]);
+                    const day = policyAnniversaryMatch[2].padStart(2, '0');
+                    const year = policyAnniversaryMatch[3];
+                    document.getElementById('policyAnniversary').value = `${year}-${month}-${day}`;
+                }
+
+                // Extract total paid
+                const totalPaidMatch = text.match(/Total paid for whole duration\s*PHP\s*([0-9,.]+)/);
+                if (totalPaidMatch) {
+                    document.getElementById('totalPaid').value = parseFloat(totalPaidMatch[1].replace(/,/g, ''));
+                }
+
+                // Extract premium amount (looking for the first premium amount in the table)
+                const premiumAmountMatch = text.match(/PHP\s*([0-9,.]+\.[0-9]{2})/);
+                if (premiumAmountMatch) {
+                    document.getElementById('premiumAmount').value = parseFloat(premiumAmountMatch[1].replace(/,/g, ''));
+                }
+
+                // Try to determine payment mode based on coverage dates
+                if (text.includes("15-Dec") || text.includes("15-Mar") || text.includes("15-Jun")) {
+                    document.getElementById('modeOfPayment').value = 'quarterly';
+                }
+            });
+        }
+
+        function getMonthNumber(monthName) {
+            const months = {
+                "January": "01", "Jan": "01",
+                "February": "02", "Feb": "02",
+                "March": "03", "Mar": "03",
+                "April": "04", "Apr": "04",
+                "May": "05",
+                "June": "06", "Jun": "06",
+                "July": "07", "Jul": "07",
+                "August": "08", "Aug": "08",
+                "September": "09", "Sep": "09",
+                "October": "10", "Oct": "10",
+                "November": "11", "Nov": "11",
+                "December": "12", "Dec": "12"
+            };
+            return months[monthName] || "01";
+        }
+        */
+
         function generateSOA() {
-            const policyAnniversary = new Date(document.getElementById('policyAnniversary').value);
-            const totalPaid = parseFloat(document.getElementById('totalPaid').value);
-            const premiumAmount = parseFloat(document.getElementById('premiumAmount').value);
-            const modeOfPayment = document.getElementById('modeOfPayment').value;
+    // Get input values
+    // Using default values for commented out fields
+    const clientName = "N/A"; // Default value since input is commented out
+    const planName = "N/A"; // Default value since input is commented out
+    const policyNo = "N/A"; // Default value since input is commented out
+    const policyAnniversary = new Date(document.getElementById('policyAnniversary').value);
+    let totalPaid = parseFloat(document.getElementById('totalPaid').value) || 0;
+    const periodPremium = parseFloat(document.getElementById('premiumAmount').value) || 0; // This is now per period
+    const modeOfPayment = document.getElementById('modeOfPayment').value;
+    const currentDate = new Date(document.getElementById('currentDate').value);
 
-            let output = `<h3>Account Summary</h3>`;
-            output += `<p><strong>Policy Anniversary:</strong> ${policyAnniversary.toDateString()}</p>`;
-            output += `<p><strong>Total Paid for Whole Duration:</strong> PHP ${totalPaid.toFixed(2)}</p>`;
+    // Validate inputs
+    if (!policyAnniversary || !periodPremium) {
+        alert('Please fill in at least the Policy Anniversary and Premium Amount fields.');
+        return;
+    }
 
-            const currentDate = new Date();
-            let balance = 0;
-            let coverageRows = '';
+    // Calculate payment intervals and annual premium based on mode
+    let intervalsPerYear;
+    switch (modeOfPayment) {
+        case 'quarterly':
+            intervalsPerYear = 4;
+            break;
+        case 'monthly':
+            intervalsPerYear = 12;
+            break;
+        default: // annual
+            intervalsPerYear = 1;
+            break;
+    }
+    
+    // Calculate annual premium and interval amount
+    const annualPremium = periodPremium * intervalsPerYear;
+    const intervalAmount = periodPremium; // This is already per period
 
-            for (let year = policyAnniversary.getFullYear(); year <= currentDate.getFullYear(); year++) {
-                if (year < currentDate.getFullYear()) {
-                    coverageRows += `<tr><td>${year}-09-15 to ${year + 1}-09-15</td><td>PHP ${(modeOfPayment === 'yearly' ? premiumAmount : premiumAmount * 4).toFixed(2)}</td><td>PAID</td></tr>`;
-                } else {
-                    const startYear = `${year}-09-15`;
-                    let endYear = `${year + 1}-09-15`;
-
-                    if (modeOfPayment === 'quarterly') {
-                        const quarters = [3, 6, 9, 12];
-                        for (let i = 0; i < quarters.length; i++) {
-                            const start = new Date(year, quarters[i] - 3, 15);
-                            const end = new Date(year, quarters[i], 15);
-                            const amountDue = premiumAmount;
-                            const paidStatus = totalPaid >= amountDue ? 'PAID' : 'NOT PAID';
-                            if (paidStatus === 'NOT PAID') balance += amountDue;
-                            coverageRows += `<tr><td>${start.toDateString()} to ${end.toDateString()}</td><td>PHP ${amountDue.toFixed(2)}</td><td>${paidStatus}</td></tr>`;
-                            totalPaid -= amountDue;
-                        }
-                    } else if (modeOfPayment === 'monthly') {
-                        for (let month = 0; month < 12; month++) {
-                            const start = new Date(year, month, 15);
-                            const end = new Date(year, month + 1, 15);
-                            const amountDue = premiumAmount;
-                            const paidStatus = totalPaid >= amountDue ? 'PAID' : 'NOT PAID';
-                            if (paidStatus === 'NOT PAID') balance += amountDue;
-                            coverageRows += `<tr><td>${start.toDateString()} to ${end.toDateString()}</td><td>PHP ${amountDue.toFixed(2)}</td><td>${paidStatus}</td></tr>`;
-                            totalPaid -= amountDue;
-                        }
-                    } else {
-                        const amountDue = premiumAmount;
-                        const paidStatus = totalPaid >= amountDue ? 'PAID' : 'NOT PAID';
-                        if (paidStatus === 'NOT PAID') balance += amountDue;
-                        coverageRows += `<tr><td>${startYear} to ${endYear}</td><td>PHP ${amountDue.toFixed(2)}</td><td>${paidStatus}</td></tr>`;
-                    }
+    // Generate coverage periods
+    const coveragePeriods = [];
+    let remainingPaid = totalPaid;
+    let totalBalance = 0;
+    let foundCurrentPeriod = false;
+    
+    // Start from the policy anniversary
+    let startYear = policyAnniversary.getFullYear();
+    let startMonth = policyAnniversary.getMonth();
+    let startDay = policyAnniversary.getDate();
+    
+    // Calculate current policy year
+    const currentPolicyYear = currentDate.getFullYear() - startYear + 
+        (currentDate.getMonth() > startMonth || 
+        (currentDate.getMonth() === startMonth && currentDate.getDate() >= startDay) ? 0 : -1);
+    
+    // Generate periods for past years (annual only)
+    for (let year = 0; year < currentPolicyYear; year++) {
+        const periodStartYear = startYear + year;
+        const startDate = new Date(periodStartYear, startMonth, startDay);
+        const endDate = new Date(periodStartYear + 1, startMonth, startDay);
+        
+        // Calculate payment status
+        let status, statusText, amountPaid = 0;
+        
+        if (remainingPaid >= annualPremium) {
+            status = 'PAID';
+            statusText = 'PAID';
+            amountPaid = annualPremium;
+            remainingPaid -= annualPremium;
+        } else if (remainingPaid > 0) {
+            status = 'PARTIAL';
+            amountPaid = remainingPaid;
+            const balance = annualPremium - remainingPaid;
+            statusText = `PAID ${amountPaid.toFixed(2)} with balance ${balance.toFixed(2)}`;
+            totalBalance += balance;
+            remainingPaid = 0;
+        } else {
+            status = 'NOT_PAID';
+            statusText = 'NOT PAID';
+            totalBalance += annualPremium;
+        }
+        
+        coveragePeriods.push({
+            startDate,
+            endDate,
+            amount: annualPremium,
+            status,
+            statusText,
+            amountPaid,
+            containsCurrentDate: false,
+            afterCurrentPeriod: false
+        });
+    }
+    
+    // Generate periods for current year (broken down by mode of payment)
+    const currentPeriodStartYear = startYear + currentPolicyYear;
+    
+    if (modeOfPayment === 'annual') {
+        // For annual payments, create one period for current year
+        const startDate = new Date(currentPeriodStartYear, startMonth, startDay);
+        const endDate = new Date(currentPeriodStartYear + 1, startMonth, startDay);
+        
+        // Check if this period contains the current date
+        const containsCurrentDate = currentDate >= startDate && currentDate < endDate;
+        if (containsCurrentDate) {
+            foundCurrentPeriod = true;
+        }
+        
+        // Calculate payment status
+        let status, statusText, amountPaid = 0;
+        
+        if (remainingPaid >= annualPremium) {
+            status = 'PAID';
+            statusText = 'PAID';
+            amountPaid = annualPremium;
+            remainingPaid -= annualPremium;
+        } else if (remainingPaid > 0) {
+            status = 'PARTIAL';
+            amountPaid = remainingPaid;
+            const balance = annualPremium - remainingPaid;
+            statusText = `PAID ${amountPaid.toFixed(2)} with balance ${balance.toFixed(2)}`;
+            
+            // Only add to balance if this is the current period or before
+            if (!foundCurrentPeriod || containsCurrentDate) {
+                totalBalance += balance;
+            }
+            
+            remainingPaid = 0;
+        } else {
+            status = 'NOT_PAID';
+            statusText = 'NOT PAID';
+            
+            // Only add to balance if this is the current period or before
+            if (!foundCurrentPeriod || containsCurrentDate) {
+                totalBalance += annualPremium;
+            }
+        }
+        
+        // Add future due indicator if this period contains the current date
+        if (containsCurrentDate && status !== 'PAID') {
+            statusText += ', FUTURE DUE';
+        }
+        
+        coveragePeriods.push({
+            startDate,
+            endDate,
+            amount: annualPremium,
+            status,
+            statusText,
+            amountPaid,
+            containsCurrentDate,
+            afterCurrentPeriod: false
+        });
+    } else {
+        // For quarterly/monthly payments, create multiple periods for current year
+        const monthsPerInterval = 12 / intervalsPerYear;
+        
+        for (let i = 0; i < intervalsPerYear; i++) {
+            const intervalStartDate = new Date(currentPeriodStartYear, startMonth + (i * monthsPerInterval), startDay);
+            const intervalEndDate = new Date(
+                i === intervalsPerYear - 1 
+                    ? currentPeriodStartYear + 1 
+                    : currentPeriodStartYear, 
+                i === intervalsPerYear - 1 
+                    ? startMonth 
+                    : startMonth + ((i + 1) * monthsPerInterval), 
+                startDay
+            );
+            
+            // Check if this period contains the current date
+            const containsCurrentDate = currentDate >= intervalStartDate && currentDate < intervalEndDate;
+            const afterCurrentPeriod = foundCurrentPeriod;
+            
+            if (containsCurrentDate) {
+                foundCurrentPeriod = true;
+            }
+            
+            // Calculate payment status
+            let status, statusText, amountPaid = 0;
+            
+            if (remainingPaid >= intervalAmount) {
+                status = 'PAID';
+                statusText = 'PAID';
+                amountPaid = intervalAmount;
+                remainingPaid -= intervalAmount;
+            } else if (remainingPaid > 0) {
+                status = 'PARTIAL';
+                amountPaid = remainingPaid;
+                const balance = intervalAmount - remainingPaid;
+                statusText = `PAID ${amountPaid.toFixed(2)} with balance ${balance.toFixed(2)}`;
+                
+                // Only add to balance if this is the current period or before
+                if (!afterCurrentPeriod) {
+                    totalBalance += balance;
+                }
+                
+                remainingPaid = 0;
+            } else {
+                status = 'NOT_PAID';
+                statusText = 'NOT PAID';
+                
+                // Only add to balance if this is the current period or before
+                if (!afterCurrentPeriod) {
+                    totalBalance += intervalAmount;
                 }
             }
-
-            output += `<table><thead><tr><th>Coverage Date</th><th>Premium Amount</th><th>Status</th></tr></thead><tbody>${coverageRows}</tbody></table>`;
-
-            if (balance > 0) {
-                output += `<h3>Balance: PHP ${balance.toFixed(2)}</h3>`;
+            
+            // Add future due indicator only if this period contains the current date
+            if (containsCurrentDate && status !== 'PAID') {
+                statusText += ', FUTURE DUE';
             }
-
-            document.getElementById('output').innerHTML = output;
+            
+            coveragePeriods.push({
+                startDate: intervalStartDate,
+                endDate: intervalEndDate,
+                amount: intervalAmount,
+                status,
+                statusText,
+                amountPaid,
+                containsCurrentDate,
+                afterCurrentPeriod
+            });
         }
+    }
+
+    // Generate HTML output
+    let output = `
+        <div class="account-summary">
+            <h3>ACCOUNT SUMMARY</h3>
+            <div class="summary-row">
+                <div class="summary-label">CLIENT'S NAME: ${clientName}</div>
+                <div class="summary-label">Total paid for whole duration</div>
+                <div class="summary-value">PHP ${totalPaid.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+            </div>
+            <div class="summary-row">
+                <div class="summary-label">Plan: ${planName}</div>
+                <div class="summary-label">Balance</div>
+                <div class="summary-value">PHP ${totalBalance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+            </div>
+            <div class="summary-row">
+                <div class="summary-label">Policy No: ${policyNo}</div>
+            </div>
+            <div class="summary-row">
+                <div class="summary-label">Policy Anniversary: ${formatDisplayDate(policyAnniversary)}</div>
+            </div>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Coverage Date</th>
+                    <th>Premium Amount</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    // Add coverage periods to table
+    coveragePeriods.forEach(period => {
+        const startDateStr = formatDisplayDate(period.startDate);
+        const endDateStr = formatDisplayDate(period.endDate);
+        const amountStr = `PHP ${period.amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        
+        let statusClass = '';
+        if (period.status === 'PAID') statusClass = 'paid';
+        else if (period.status === 'PARTIAL') statusClass = 'partial-paid';
+        else statusClass = 'not-paid';
+        
+        if (period.statusText.includes('FUTURE DUE')) statusClass += ' future-due';
+        
+        output += `
+            <tr>
+                <td>${startDateStr} to ${endDateStr}</td>
+                <td>${amountStr}</td>
+                <td class="${statusClass}">${period.statusText}</td>
+            </tr>
+        `;
+    });
+
+    output += `
+            </tbody>
+        </table>
+    `;
+
+    document.getElementById('output').innerHTML = output;
+}
     </script>
 </body>
 </html>
+
