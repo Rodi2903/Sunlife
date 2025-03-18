@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statement of Account Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background: #002147;
+            color: white;
+        }
+        .input-group {
+            margin-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+        }
+        button {
+            background: #002147;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Statement of Account Generator</h2>
+
+        <div id="form-section">
+            <div class="input-group">
+                <label>Client's Name:</label>
+                <input type="text" id="clientName" placeholder="Enter Client's Name">
+            </div>
+
+            <div class="input-group">
+                <label>Plan:</label>
+                <input type="text" id="plan" placeholder="Enter Plan">
+            </div>
+
+            <div class="input-group">
+                <label>Policy Number:</label>
+                <input type="text" id="policyNo" placeholder="Enter Policy Number">
+            </div>
+
+            <div class="input-group">
+                <label>Policy Anniversary (YYYY-MM-DD):</label>
+                <input type="date" id="policyAnniversary">
+            </div>
+
+            <div class="input-group">
+                <label>Total Paid (PHP):</label>
+                <input type="number" id="totalPaid" placeholder="Enter Total Paid">
+            </div>
+
+            <div class="input-group">
+                <label>Premium Amount (PHP):</label>
+                <input type="number" id="premiumAmount" placeholder="Enter Premium Amount">
+            </div>
+
+            <button onclick="generateSOA()">Generate Statement</button>
+        </div>
+
+        <div id="soa-section" style="display:none;">
+            <h3>Account Summary</h3>
+            <p><strong>Client's Name:</strong> <span id="soaClientName"></span></p>
+            <p><strong>Plan:</strong> <span id="soaPlan"></span></p>
+            <p><strong>Policy No:</strong> <span id="soaPolicyNo"></span></p>
+            <p><strong>Policy Anniversary:</strong> <span id="soaPolicyAnniversary"></span></p>
+            <p><strong>Total Paid for Whole Duration:</strong> PHP <span id="soaTotalPaid"></span></p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Coverage Date</th>
+                        <th>Premium Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="coverageTable"></tbody>
+            </table>
+
+            <button onclick="resetForm()">Create New Statement</button>
+        </div>
+    </div>
+
+    <script>
+        function generateSOA() {
+            const clientName = document.getElementById('clientName').value;
+            const plan = document.getElementById('plan').value;
+            const policyNo = document.getElementById('policyNo').value;
+            const policyAnniversary = new Date(document.getElementById('policyAnniversary').value);
+            const totalPaid = parseFloat(document.getElementById('totalPaid').value) || 0;
+            const premiumAmount = parseFloat(document.getElementById('premiumAmount').value) || 0;
+
+            document.getElementById('soaClientName').textContent = clientName;
+            document.getElementById('soaPlan').textContent = plan;
+            document.getElementById('soaPolicyNo').textContent = policyNo;
+            document.getElementById('soaPolicyAnniversary').textContent = policyAnniversary.toDateString();
+            document.getElementById('soaTotalPaid').textContent = totalPaid.toFixed(2);
+
+            const coverageTable = document.getElementById('coverageTable');
+            coverageTable.innerHTML = '';
+
+            let remainingBalance = totalPaid;
+
+            for (let i = 0; i < 4; i++) {
+                const startDate = new Date(policyAnniversary);
+                startDate.setFullYear(startDate.getFullYear() + i);
+
+                const endDate = new Date(startDate);
+                endDate.setFullYear(startDate.getFullYear() + 1);
+
+                let status = 'NOT PAID';
+
+                if (remainingBalance >= premiumAmount) {
+                    status = 'PAID';
+                    remainingBalance -= premiumAmount;
+                } else if (remainingBalance > 0) {
+                    status = `PAID ${remainingBalance.toFixed(2)} with balance ${(premiumAmount - remainingBalance).toFixed(2)}`;
+                    remainingBalance = 0;
+                }
+
+                coverageTable.innerHTML += `
+                    <tr>
+                        <td>${startDate.toDateString()} to ${endDate.toDateString()}</td>
+                        <td>PHP ${premiumAmount.toFixed(2)}</td>
+                        <td>${status}</td>
+                    </tr>
+                `;
+            }
+
+            document.getElementById('form-section').style.display = 'none';
+            document.getElementById('soa-section').style.display = 'block';
+        }
+
+        function resetForm() {
+            document.getElementById('form-section').style.display = 'block';
+            document.getElementById('soa-section').style.display = 'none';
+            document.querySelectorAll('input').forEach(input => input.value = '');
+        }
+    </script>
+</body>
+</html>
