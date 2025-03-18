@@ -2,21 +2,27 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Statement of Account Generator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: #f5f5f5;
+            background-color: #f4f4f9;
             margin: 20px;
         }
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: auto;
             background: #fff;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: #1e3a63;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
         }
         table {
             width: 100%;
@@ -24,150 +30,97 @@
             margin-top: 20px;
         }
         th, td {
-            border: 1px solid #ddd;
             padding: 10px;
             text-align: left;
+            border-bottom: 1px solid #ddd;
         }
         th {
-            background: #002147;
+            background: #1e3a63;
             color: white;
-        }
-        .input-group {
-            margin-bottom: 10px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        input {
-            width: 100%;
-            padding: 8px;
-        }
-        button {
-            background: #002147;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Statement of Account Generator</h2>
-
-        <div id="form-section">
-            <div class="input-group">
-                <label>Client's Name:</label>
-                <input type="text" id="clientName" placeholder="Enter Client's Name">
-            </div>
-
-            <div class="input-group">
-                <label>Plan:</label>
-                <input type="text" id="plan" placeholder="Enter Plan">
-            </div>
-
-            <div class="input-group">
-                <label>Policy Number:</label>
-                <input type="text" id="policyNo" placeholder="Enter Policy Number">
-            </div>
-
-            <div class="input-group">
-                <label>Policy Anniversary (YYYY-MM-DD):</label>
-                <input type="date" id="policyAnniversary">
-            </div>
-
-            <div class="input-group">
-                <label>Total Paid (PHP):</label>
-                <input type="number" id="totalPaid" placeholder="Enter Total Paid">
-            </div>
-
-            <div class="input-group">
-                <label>Premium Amount (PHP):</label>
-                <input type="number" id="premiumAmount" placeholder="Enter Premium Amount">
-            </div>
-
-            <button onclick="generateSOA()">Generate Statement</button>
+        <div class="header">
+            <h2>Statement of Account</h2>
         </div>
 
-        <div id="soa-section" style="display:none;">
-            <h3>Account Summary</h3>
-            <p><strong>Client's Name:</strong> <span id="soaClientName"></span></p>
-            <p><strong>Plan:</strong> <span id="soaPlan"></span></p>
-            <p><strong>Policy No:</strong> <span id="soaPolicyNo"></span></p>
-            <p><strong>Policy Anniversary:</strong> <span id="soaPolicyAnniversary"></span></p>
-            <p><strong>Total Paid for Whole Duration:</strong> PHP <span id="soaTotalPaid"></span></p>
+        <label>Policy Anniversary: <input type="date" id="policyAnniversary"></label><br><br>
+        <label>Total Paid for Whole Duration: <input type="number" id="totalPaid"></label><br><br>
+        <label>Premium Amount: <input type="number" id="premiumAmount"></label><br><br>
+        <label>Mode of Payment: 
+            <select id="modeOfPayment">
+                <option value="yearly">Yearly</option>
+                <option value="quarterly">Quarterly</option>
+                <option value="monthly">Monthly</option>
+            </select>
+        </label><br><br>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Coverage Date</th>
-                        <th>Premium Amount</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="coverageTable"></tbody>
-            </table>
+        <button onclick="generateSOA()">Generate Statement</button>
 
-            <button onclick="resetForm()">Create New Statement</button>
-        </div>
+        <div id="output"></div>
     </div>
 
     <script>
         function generateSOA() {
-            const clientName = document.getElementById('clientName').value;
-            const plan = document.getElementById('plan').value;
-            const policyNo = document.getElementById('policyNo').value;
             const policyAnniversary = new Date(document.getElementById('policyAnniversary').value);
-            const totalPaid = parseFloat(document.getElementById('totalPaid').value) || 0;
-            const premiumAmount = parseFloat(document.getElementById('premiumAmount').value) || 0;
+            const totalPaid = parseFloat(document.getElementById('totalPaid').value);
+            const premiumAmount = parseFloat(document.getElementById('premiumAmount').value);
+            const modeOfPayment = document.getElementById('modeOfPayment').value;
 
-            document.getElementById('soaClientName').textContent = clientName;
-            document.getElementById('soaPlan').textContent = plan;
-            document.getElementById('soaPolicyNo').textContent = policyNo;
-            document.getElementById('soaPolicyAnniversary').textContent = policyAnniversary.toDateString();
-            document.getElementById('soaTotalPaid').textContent = totalPaid.toFixed(2);
+            let output = `<h3>Account Summary</h3>`;
+            output += `<p><strong>Policy Anniversary:</strong> ${policyAnniversary.toDateString()}</p>`;
+            output += `<p><strong>Total Paid for Whole Duration:</strong> PHP ${totalPaid.toFixed(2)}</p>`;
 
-            const coverageTable = document.getElementById('coverageTable');
-            coverageTable.innerHTML = '';
+            const currentDate = new Date();
+            let balance = 0;
+            let coverageRows = '';
 
-            let remainingBalance = totalPaid;
+            for (let year = policyAnniversary.getFullYear(); year <= currentDate.getFullYear(); year++) {
+                if (year < currentDate.getFullYear()) {
+                    coverageRows += `<tr><td>${year}-09-15 to ${year + 1}-09-15</td><td>PHP ${(modeOfPayment === 'yearly' ? premiumAmount : premiumAmount * 4).toFixed(2)}</td><td>PAID</td></tr>`;
+                } else {
+                    const startYear = `${year}-09-15`;
+                    let endYear = `${year + 1}-09-15`;
 
-            for (let i = 0; i < 4; i++) {
-                const startDate = new Date(policyAnniversary);
-                startDate.setFullYear(startDate.getFullYear() + i);
-
-                const endDate = new Date(startDate);
-                endDate.setFullYear(startDate.getFullYear() + 1);
-
-                let status = 'NOT PAID';
-
-                if (remainingBalance >= premiumAmount) {
-                    status = 'PAID';
-                    remainingBalance -= premiumAmount;
-                } else if (remainingBalance > 0) {
-                    status = `PAID ${remainingBalance.toFixed(2)} with balance ${(premiumAmount - remainingBalance).toFixed(2)}`;
-                    remainingBalance = 0;
+                    if (modeOfPayment === 'quarterly') {
+                        const quarters = [3, 6, 9, 12];
+                        for (let i = 0; i < quarters.length; i++) {
+                            const start = new Date(year, quarters[i] - 3, 15);
+                            const end = new Date(year, quarters[i], 15);
+                            const amountDue = premiumAmount;
+                            const paidStatus = totalPaid >= amountDue ? 'PAID' : 'NOT PAID';
+                            if (paidStatus === 'NOT PAID') balance += amountDue;
+                            coverageRows += `<tr><td>${start.toDateString()} to ${end.toDateString()}</td><td>PHP ${amountDue.toFixed(2)}</td><td>${paidStatus}</td></tr>`;
+                            totalPaid -= amountDue;
+                        }
+                    } else if (modeOfPayment === 'monthly') {
+                        for (let month = 0; month < 12; month++) {
+                            const start = new Date(year, month, 15);
+                            const end = new Date(year, month + 1, 15);
+                            const amountDue = premiumAmount;
+                            const paidStatus = totalPaid >= amountDue ? 'PAID' : 'NOT PAID';
+                            if (paidStatus === 'NOT PAID') balance += amountDue;
+                            coverageRows += `<tr><td>${start.toDateString()} to ${end.toDateString()}</td><td>PHP ${amountDue.toFixed(2)}</td><td>${paidStatus}</td></tr>`;
+                            totalPaid -= amountDue;
+                        }
+                    } else {
+                        const amountDue = premiumAmount;
+                        const paidStatus = totalPaid >= amountDue ? 'PAID' : 'NOT PAID';
+                        if (paidStatus === 'NOT PAID') balance += amountDue;
+                        coverageRows += `<tr><td>${startYear} to ${endYear}</td><td>PHP ${amountDue.toFixed(2)}</td><td>${paidStatus}</td></tr>`;
+                    }
                 }
-
-                coverageTable.innerHTML += `
-                    <tr>
-                        <td>${startDate.toDateString()} to ${endDate.toDateString()}</td>
-                        <td>PHP ${premiumAmount.toFixed(2)}</td>
-                        <td>${status}</td>
-                    </tr>
-                `;
             }
 
-            document.getElementById('form-section').style.display = 'none';
-            document.getElementById('soa-section').style.display = 'block';
-        }
+            output += `<table><thead><tr><th>Coverage Date</th><th>Premium Amount</th><th>Status</th></tr></thead><tbody>${coverageRows}</tbody></table>`;
 
-        function resetForm() {
-            document.getElementById('form-section').style.display = 'block';
-            document.getElementById('soa-section').style.display = 'none';
-            document.querySelectorAll('input').forEach(input => input.value = '');
+            if (balance > 0) {
+                output += `<h3>Balance: PHP ${balance.toFixed(2)}</h3>`;
+            }
+
+            document.getElementById('output').innerHTML = output;
         }
     </script>
 </body>
