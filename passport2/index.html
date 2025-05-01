@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sun Life Training Journey Passport</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Turn.js library -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Sun Life Training Journey Passport</h1>
+    </div>
+
+    <!-- Login/Registration Form -->
+    <div id="auth-container" class="auth-container">
+      <div class="auth-form">
+        <h2>Access Your Passport</h2>
+        <p>Enter your email to access or create your training passport.</p>
+        
+        <div class="form-group">
+          <label for="advisor-email">Email Address</label>
+          <input type="email" id="advisor-email" placeholder="your.email@example.com" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="advisor-name">Full Name</label>
+          <input type="text" id="advisor-name" placeholder="Your Name" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="advisor-type">Advisor Level</label>
+          <select id="advisor-type">
+            <option value="rookie">Rookie (0-1.5 years)</option>
+            <option value="experienced">Experienced (1.5-2 years)</option>
+          </select>
+        </div>
+        
+        <button id="access-passport-btn" class="btn primary-btn">Access Passport</button>
+        <p id="auth-message" class="message"></p>
+      </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loading-container" class="loading-container hidden">
+      <div class="spinner"></div>
+      <p>Loading your passport...</p>
+    </div>
+
+    <!-- Passport Book Container -->
+    <div id="passport-container" class="passport-container hidden">
+      <!-- Passport Book -->
+      <div id="passport-book" class="passport-book">
+        <!-- Cover -->
+        <div class="hard cover-front">
+          <div class="cover-content">
+            <div class="logo-circle">
+              <div class="inner-circle">SUN LIFE</div>
+            </div>
+            <h1>PASSPORT</h1>
+            <h2>SUN LIFE TRAINING JOURNEY</h2>
+            <div class="advisor-level-box">
+              <h3 id="cover-advisor-level">ADVISOR A (ROOKIE)</h3>
+            </div>
+            <p class="cover-subtitle">This passport belongs to a Sun Life Advisor on their journey to excellence</p>
+            <div class="passport-id">
+              <span id="passport-id-display"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inside Front Cover -->
+        <div class="hard">
+          <div class="page-content">
+            <h2 class="page-title">WELCOME TO YOUR JOURNEY</h2>
+            <p>This passport tracks your progress through the Sun Life Training Journey.</p>
+            <p>Complete milestones to earn stamps and track your professional development.</p>
+          </div>
+        </div>
+
+        <!-- Personal Information Page -->
+        <div>
+          <div class="page-content">
+            <h2 class="page-title">PERSONAL INFORMATION</h2>
+            
+            <div class="info-section">
+              <div class="info-row">
+                <label>Name:</label>
+                <span id="display-name"></span>
+              </div>
+              
+              <div class="info-row">
+                <label>Email:</label>
+                <span id="display-email"></span>
+              </div>
+              
+              <div class="info-row">
+                <label>Advisor Level:</label>
+                <span id="display-level"></span>
+              </div>
+              
+              <div class="info-row">
+                <label>Passport ID:</label>
+                <span id="display-passport-id"></span>
+              </div>
+              
+              <div class="info-row">
+                <label>Last Updated:</label>
+                <span id="display-last-updated"></span>
+              </div>
+            </div>
+            
+            <div class="actions-section">
+              <button id="change-level-btn" class="btn secondary-btn">Change Advisor Level</button>
+              <button id="logout-btn" class="btn outline-btn">Logout</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Milestones Pages (will be dynamically generated) -->
+        <div id="milestones-pages">
+          <!-- Milestones will be inserted here -->
+        </div>
+
+        <!-- Inside Back Cover -->
+        <div class="hard">
+          <div class="page-content">
+            <h2 class="page-title">YOUR PROGRESS</h2>
+            <div class="progress-section">
+              <div class="progress-info">
+                <span id="progress-text">0 of 0 milestones completed</span>
+              </div>
+              <div class="progress-bar-container">
+                <div id="progress-bar" class="progress-bar"></div>
+              </div>
+            </div>
+            
+            <div class="completion-message">
+              <p>Continue your journey to excellence with Sun Life!</p>
+              <p>Your progress is automatically saved.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Back Cover -->
+        <div class="hard cover-back">
+          <div class="cover-content back-cover">
+            <div class="sun-life-logo">SUN LIFE</div>
+            <p>Training Journey Passport</p>
+            <p class="copyright">© Sun Life Financial</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div id="passport-controls" class="passport-controls hidden">
+      <button id="prev-btn" class="btn control-btn">Previous</button>
+      <span id="page-num">Page: <span id="current-page">1</span> / <span id="total-pages">6</span></span>
+      <button id="next-btn" class="btn control-btn">Next</button>
+    </div>
+  </div>
+
+  <!-- Templates -->
+  <template id="milestone-page-template">
+    <div>
+      <div class="page-content milestone-page">
+        <h2 class="page-title">MILESTONES</h2>
+        <div class="milestones-grid">
+          <!-- Milestone items will be inserted here -->
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="milestone-item-template">
+    <div class="milestone-item" data-id="">
+      <h3 class="milestone-title"></h3>
+      <p class="milestone-description"></p>
+      <div class="stamp hidden">
+        <div class="stamp-content">
+          <div class="stamp-text">COMPLETED</div>
+          <div class="stamp-date"></div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- Notification -->
+  <div id="notification" class="notification hidden">
+    <div class="notification-content">
+      <span id="notification-message"></span>
+      <button id="notification-close" class="notification-close">&times;</button>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2 id="modal-title">Change Advisor Level</h2>
+      <div id="modal-body">
+        <p>Changing your advisor level will reset your milestone progress. Are you sure you want to continue?</p>
+        <div class="form-group">
+          <label for="new-advisor-type">Select New Level:</label>
+          <select id="new-advisor-type">
+            <option value="rookie">Rookie (0-1.5 years)</option>
+            <option value="experienced">Experienced (1.5-2 years)</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="modal-cancel" class="btn outline-btn">Cancel</button>
+        <button id="modal-confirm" class="btn primary-btn">Confirm Change</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
