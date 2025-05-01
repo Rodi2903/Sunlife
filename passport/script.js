@@ -24,7 +24,7 @@ function stamp(btn) {
 }
 
 function sendDataToSheet() {
-  fetch("YOUR_GOOGLE_APPS_SCRIPT_WEBAPP_URL", {
+  fetch("https://script.google.com/macros/s/AKfycbz4SsX1iO1-fRPBu4zyI9vfFlhjzy5NujBrXtGJWVhH3zdApdNxMlKzFbR-Drn9rR58zw/exec", {
     method: "POST",
     body: JSON.stringify({
       name: advisorName,
