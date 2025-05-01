@@ -1,0 +1,30 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sun Life Advisor Passport</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="turn.min.js"></script>
+</head>
+<body>
+  <div class="login">
+    <input type="text" id="name" placeholder="Your Name" />
+    <input type="email" id="email" placeholder="Your Email" />
+    <button onclick="startPassport()">Start Passport</button>
+  </div>
+
+  <div class="flipbook" id="passport" style="display: none;">
+    <div class="page cover">Welcome to your Passport</div>
+    <div class="page" data-stamp="POWERBOOST">POWERBOOST<br><button onclick="stamp(this)">Stamp</button></div>
+    <div class="page" data-stamp="START">START<br><button onclick="stamp(this)">Stamp</button></div>
+    <div class="page" data-stamp="4PILLARS">4PILLARS<br><button onclick="stamp(this)">Stamp</button></div>
+    <div class="page" data-stamp="JFW">JFW<br><button onclick="stamp(this)">Stamp</button></div>
+    <div class="page" data-stamp="90k Validation">90k Validation<br><button onclick="stamp(this)">Stamp</button></div>
+    <div class="page" data-stamp="PRODUCTS Masterclass">PRODUCTS Masterclass<br><button onclick="stamp(this)">Stamp</button></div>
+    <div class="page">Thank you!</div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
