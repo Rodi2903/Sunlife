@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sun Life Training Journey Passport</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <!-- Turn.js library -->
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -58,38 +58,37 @@
         <!-- Cover -->
         <div class="hard cover-front">
           <div class="cover-content">
-            <div class="sun-logo">
-              <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/3-laAoosRvBS71W93v52ciYtEqbzYzkf.svg" alt="Sun Life Logo" class="sun-life-logo-img">
-            </div>
             <h1>PASSPORT</h1>
-            <h2>SUN LIFE TRAINING JOURNEY</h2>
-            <div class="advisor-level-box">
-              <h3 id="cover-advisor-level">ADVISOR A (ROOKIE)</h3>
+            <div class="sun-logo">
+              <img src="public/images/sun-life-logo.png" alt="Sun Life Logo" class="sun-life-logo-img">
             </div>
-            <p class="cover-subtitle">This passport belongs to a Sun Life Advisor on their journey to excellence</p>
-            <div class="passport-id">
-              <span id="passport-id-display"></span>
+            <div class="cover-bottom">
+              <h2>SUNLIFE</h2>
+              <h3>TRAINING JOURNEY</h3>
             </div>
           </div>
         </div>
 
         <!-- Inside Front Cover -->
         <div class="hard inside-cover">
-          <div class="page-content">
+          <div class="page-content wave-bg">
             <div class="binding-effect left"></div>
-            <h2 class="page-title">WELCOME TO YOUR JOURNEY</h2>
             <div class="inside-page-content">
               <div class="sun-life-header">
-                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/2-5o0BrP9fTxZPmiiDcaQY3El67iREv0.svg" alt="Sun Life Training Journey" class="inside-header-img">
+                <img src="public/images/sun-life-logo.png" alt="Sun Life Logo" class="sun-life-logo-img">
+                <div class="title-container">
+                  <h2 class="sunlife-title">Sun Life</h2>
+                  <h3 class="training-journey">TRAINING<br>JOURNEY</h3>
+                </div>
               </div>
               <div class="ribbon-container">
                 <div class="ribbon">
                   <span>ROOKIES/ADVISORS PASSPORT</span>
                 </div>
               </div>
-              <p class="passport-description">WHERE YOUR MILESTONES WILL HAVE STAMPS.</p>
+              <p class="passport-description">WHERE YOUR MILESTONES<br>WILL HAVE STAMPS.</p>
               <div class="certified-stamp">
-                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/5-XXUzdS1ndEl9DvXlZ3vtRZKRUsPLDG.svg" alt="Certified" class="certified-img">
+                <img src="public/images/certified-gold.png" alt="Certified" class="certified-img">
               </div>
             </div>
           </div>
@@ -97,7 +96,7 @@
 
         <!-- Personal Information Page -->
         <div>
-          <div class="page-content">
+          <div class="page-content wave-bg">
             <div class="binding-effect left"></div>
             <h2 class="page-title">PERSONAL INFORMATION</h2>
             
@@ -142,7 +141,7 @@
 
         <!-- Inside Back Cover -->
         <div class="hard inside-cover">
-          <div class="page-content">
+          <div class="page-content wave-bg">
             <div class="binding-effect right"></div>
             <h2 class="page-title">YOUR PROGRESS</h2>
             <div class="progress-section">
@@ -165,10 +164,9 @@
         <div class="hard cover-back">
           <div class="cover-content back-cover">
             <div class="sun-logo">
-              <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/3-laAoosRvBS71W93v52ciYtEqbzYzkf.svg" alt="Sun Life Logo" class="sun-life-logo-img">
+              <img src="public/images/sun-life-logo.png" alt="Sun Life Logo" class="sun-life-logo-img">
             </div>
-            <p>SUN LIFE TRAINING JOURNEY</p>
-            <p class="copyright">© Sun Life Financial</p>
+            <p class="back-title">SUN LIFE TRAINING JOURNEY</p>
           </div>
         </div>
       </div>
@@ -183,13 +181,13 @@
   </div>
 
   <!-- Templates -->
-  <template id="milestone-page-template">
+  <template id="milestone-page-template-rookie">
     <div>
-      <div class="page-content milestone-page">
+      <div class="page-content wave-bg milestone-page">
         <div class="binding-effect left"></div>
-        <div class="advisor-header">
-          <h2 class="advisor-title">ADVISOR A (ROOKIE)</h2>
-          <div class="advisor-divider"></div>
+        <div class="advisor-header rookie">
+          <h2 class="advisor-title">ADVISOR A <span class="gold-text">(ROOKIE)</span></h2>
+          <div class="advisor-divider rookie-divider"></div>
         </div>
         <div class="milestones-grid">
           <!-- Milestone items will be inserted here -->
@@ -198,15 +196,41 @@
     </div>
   </template>
 
-  <template id="milestone-item-template">
-    <div class="milestone-item" data-id="">
-      <div class="milestone-stamp-container">
-        <div class="certified-stamp milestone-stamp">
-          <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/5-XXUzdS1ndEl9DvXlZ3vtRZKRUsPLDG.svg" alt="Certified" class="certified-img">
+  <template id="milestone-page-template-experienced">
+    <div>
+      <div class="page-content wave-bg milestone-page">
+        <div class="binding-effect left"></div>
+        <div class="advisor-header experienced">
+          <h2 class="advisor-title">ADVISOR B <span class="gold-text">(1.5 YR - 2 YEARS)</span></h2>
+          <div class="advisor-divider experienced-divider"></div>
+        </div>
+        <div class="milestones-grid">
+          <!-- Milestone items will be inserted here -->
         </div>
       </div>
+    </div>
+  </template>
+
+  <template id="milestone-item-template-rookie">
+    <div class="milestone-item" data-id="">
+      <div class="milestone-stamp-container">
+        <img src="public/images/certified-teal.png" alt="Certified" class="certified-img rookie-stamp">
+      </div>
       <div class="milestone-content">
-        <div class="milestone-number">MILESTONE <span class="milestone-num"></span> :</div>
+        <div class="milestone-number gold-text">MILESTONE <span class="milestone-num"></span> :</div>
+        <h3 class="milestone-title"></h3>
+        <p class="milestone-description"></p>
+      </div>
+    </div>
+  </template>
+
+  <template id="milestone-item-template-experienced">
+    <div class="milestone-item" data-id="">
+      <div class="milestone-stamp-container">
+        <img src="public/images/certified-gold.png" alt="Certified" class="certified-img experienced-stamp">
+      </div>
+      <div class="milestone-content">
+        <div class="milestone-number teal-text">MILESTONE <span class="milestone-num"></span> :</div>
         <h3 class="milestone-title"></h3>
         <p class="milestone-description"></p>
       </div>
@@ -241,11 +265,6 @@
         <button id="modal-confirm" class="btn primary-btn">Confirm Change</button>
       </div>
     </div>
-  </div>
-
-  <!-- Decorative Elements -->
-  <div class="decorative-elements">
-    <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/7-5D3f5NR8gVtNRWkV89Lht9kfMBBPie.svg" alt="" class="decorative-element decorative-1">
   </div>
 
   <script src="app.js"></script>
