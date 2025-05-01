@@ -204,7 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const advisorAPage1 = document.createElement("div")
     advisorAPage1.innerHTML = `
       <div class="page-content wave-bg milestone-page">
-        <div class="binding-effect left"></div>
+        <div class="binding-effect right"></div>
         <div class="advisor-header rookie">
           <h2 class="advisor-title">ADVISOR A <span class="gold-text">(ROOKIE)</span></h2>
           <div class="advisor-divider rookie-divider"></div>

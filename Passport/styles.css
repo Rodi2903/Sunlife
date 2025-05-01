@@ -428,7 +428,7 @@ body {
 .binding-effect {
   position: absolute;
   top: 0;
-  width: 20px;
+  width: 3px;
   height: 100%;
   background-image: linear-gradient(
     to bottom,
