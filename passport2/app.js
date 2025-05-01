@@ -112,12 +112,19 @@ const milestoneItemTemplateExperienced = document.getElementById("milestone-item
 // Current user data
 let currentUser = null
 
-// Import jQuery
-import $ from "jquery"
+// Remove the ES6 import statement
+// Replace this line:
+// import $ from "jquery"
+// The jQuery variable is already available from the CDN
+const $ = window.jQuery
 
 // Initialize the application
-document.addEventListener("DOMContentLoaded", init)
+document.addEventListener("DOMContentLoaded", () => {
+  init()
+  checkForSharedPassport()
+})
 
+// Add event listeners for share and download buttons
 function init() {
   // Check if user is already logged in
   const savedUser = localStorage.getItem("sunLifePassportUser")
@@ -140,6 +147,14 @@ function init() {
   modalConfirm.addEventListener("click", handleModalConfirm)
   changeLevelBtn.addEventListener("click", showChangeLevelModal)
   logoutBtn.addEventListener("click", handleLogout)
+
+  // Add event listeners for share and download
+  document.getElementById("share-btn").addEventListener("click", showShareModal)
+  document.getElementById("download-btn").addEventListener("click", downloadPassport)
+  document.getElementById("copy-link-btn").addEventListener("click", copyShareLink)
+  document.getElementById("email-share-btn").addEventListener("click", shareViaEmail)
+  document.getElementById("whatsapp-share-btn").addEventListener("click", shareViaWhatsApp)
+  document.querySelector(".close-share-modal").addEventListener("click", hideShareModal)
 }
 
 // Handle access passport button click
@@ -545,11 +560,125 @@ function isValidEmail(email) {
 function debounce(func, wait) {
   let timeout
   return function () {
-    
     const args = arguments
     clearTimeout(timeout)
     timeout = setTimeout(() => {
       func.apply(this, args)
     }, wait)
   }
+}
+
+// Show share modal
+function showShareModal() {
+  if (!currentUser) return
+
+  // Generate a shareable link with encoded user data
+  const shareData = {
+    id: currentUser.passportId,
+    name: currentUser.name,
+    level: currentUser.level,
+    progress: calculateProgress(),
+  }
+
+  const shareLink = `${window.location.origin}${window.location.pathname}?share=${btoa(JSON.stringify(shareData))}`
+  document.getElementById("share-link").value = shareLink
+
+  document.getElementById("share-modal").classList.remove("hidden")
+}
+
+// Hide share modal
+function hideShareModal() {
+  document.getElementById("share-modal").classList.add("hidden")
+}
+
+// Copy share link to clipboard
+function copyShareLink() {
+  const shareLink = document.getElementById("share-link")
+  shareLink.select()
+  document.execCommand("copy")
+
+  showNotification("Link copied to clipboard!")
+}
+
+// Share via email
+function shareViaEmail() {
+  if (!currentUser) return
+
+  const subject = `Check out my Sun Life Training Journey Passport`
+  const body = `Hi,
+
+I wanted to share my Sun Life Training Journey Passport with you.
+
+Name: ${currentUser.name}
+Advisor Level: ${currentUser.level === "rookie" ? "Advisor A (Rookie)" : "Advisor B (1.5-2 years)"}
+Progress: ${calculateProgress().completedCount} of ${calculateProgress().totalCount} milestones completed
+
+You can view my passport at: ${document.getElementById("share-link").value}
+
+Regards,
+${currentUser.name}`
+
+  window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+}
+
+// Share via WhatsApp
+function shareViaWhatsApp() {
+  if (!currentUser) return
+
+  const text = `Check out my Sun Life Training Journey Passport! I've completed ${calculateProgress().completedCount} of ${calculateProgress().totalCount} milestones. ${document.getElementById("share-link").value}`
+
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank")
+}
+
+// Download passport as PDF
+function downloadPassport() {
+  showNotification("Preparing your passport for download...")
+
+  // In a real implementation, you would use a library like html2pdf.js or jsPDF
+  // For this demo, we'll simulate the download
+  setTimeout(() => {
+    const link = document.createElement("a")
+    link.href = "#"
+    link.download = `SunLife_Passport_${currentUser.passportId}.pdf`
+    link.click()
+
+    showNotification("Your passport has been downloaded!")
+  }, 1500)
+}
+
+// Calculate progress for sharing
+function calculateProgress() {
+  const currentLevelMilestones = Object.keys(currentUser.milestones).filter((key) => key.startsWith(currentUser.level))
+  const completedCount = currentLevelMilestones.filter((key) => currentUser.milestones[key]?.completed).length
+  const totalCount = milestonesData[currentUser.level].length
+
+  return {
+    completedCount,
+    totalCount,
+    percentage: (completedCount / totalCount) * 100,
+  }
+}
+
+// Check for shared passport on page load
+function checkForSharedPassport() {
+  const urlParams = new URLSearchParams(window.location.search)
+  const shareParam = urlParams.get("share")
+
+  if (shareParam) {
+    try {
+      const sharedData = JSON.parse(atob(shareParam))
+
+      // Display shared passport in view-only mode
+      showSharedPassport(sharedData)
+    } catch (error) {
+      console.error("Error parsing shared passport data:", error)
+    }
+  }
+}
+
+// Show shared passport
+function showSharedPassport(sharedData) {
+  // In a real implementation, you would create a view-only version of the passport
+  // For this demo, we'll just show a notification
+  showNotification(`Viewing shared passport for ${sharedData.name}`)
 }

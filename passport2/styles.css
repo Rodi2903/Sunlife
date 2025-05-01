@@ -245,7 +245,7 @@ body {
 /* Cover styles */
 .cover-front,
 .cover-back {
-  background-image: url("public/images/leather-texture.png");
+  background-image: url("public/leather-texture.png");
   background-size: cover;
   background-position: center;
   color: var(--white);
@@ -314,7 +314,7 @@ body {
 }
 
 .wave-bg {
-  background-image: url("public/images/wave-pattern.png");
+  background-image: url("public/wave-pattern.png");
   background-size: cover;
   background-position: center;
 }
@@ -605,6 +605,34 @@ body {
   display: flex;
   gap: 1rem;
   margin-top: 2rem;
+}
+
+/* Add styles for sharing buttons */
+.share-btn,
+.download-btn {
+  background-color: var(--secondary-color);
+  color: var(--white);
+  margin-left: 1rem;
+}
+
+.share-btn:hover,
+.download-btn:hover {
+  background-color: var(--secondary-dark);
+}
+
+.share-link-container {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.share-link-container input {
+  flex: 1;
+}
+
+.share-options {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
 }
 
 /* Advisor Header */

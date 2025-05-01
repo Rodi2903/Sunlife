@@ -60,7 +60,7 @@
           <div class="cover-content">
             <h1>PASSPORT</h1>
             <div class="sun-logo">
-              <img src="public/images/sun-life-logo.png" alt="Sun Life Logo" class="sun-life-logo-img">
+              <img src="public/sun-life-logo.png" alt="Sun Life Logo" class="sun-life-logo-img">
             </div>
             <div class="cover-bottom">
               <h2>SUNLIFE</h2>
@@ -75,7 +75,7 @@
             <div class="binding-effect left"></div>
             <div class="inside-page-content">
               <div class="sun-life-header">
-                <img src="public/images/sun-life-logo.png" alt="Sun Life Logo" class="sun-life-logo-img">
+                <img src="public/sun-life-logo.png" alt="Sun Life Logo" class="sun-life-logo-img">
                 <div class="title-container">
                   <h2 class="sunlife-title">Sun Life</h2>
                   <h3 class="training-journey">TRAINING<br>JOURNEY</h3>
@@ -88,7 +88,7 @@
               </div>
               <p class="passport-description">WHERE YOUR MILESTONES<br>WILL HAVE STAMPS.</p>
               <div class="certified-stamp">
-                <img src="public/images/certified-gold.png" alt="Certified" class="certified-img">
+                <img src="public/certified-gold.png" alt="Certified" class="certified-img">
               </div>
             </div>
           </div>
@@ -164,7 +164,7 @@
         <div class="hard cover-back">
           <div class="cover-content back-cover">
             <div class="sun-logo">
-              <img src="public/images/sun-life-logo.png" alt="Sun Life Logo" class="sun-life-logo-img">
+              <img src="public/sun-life-logo.png" alt="Sun Life Logo" class="sun-life-logo-img">
             </div>
             <p class="back-title">SUN LIFE TRAINING JOURNEY</p>
           </div>
@@ -173,12 +173,14 @@
     </div>
 
     <!-- Controls -->
+    <!-- Add sharing and download buttons to the passport controls -->
     <div id="passport-controls" class="passport-controls hidden">
       <button id="prev-btn" class="btn control-btn">Previous</button>
       <span id="page-num">Page: <span id="current-page">1</span> / <span id="total-pages">6</span></span>
       <button id="next-btn" class="btn control-btn">Next</button>
+      <button id="share-btn" class="btn share-btn">Share Passport</button>
+      <button id="download-btn" class="btn download-btn">Download</button>
     </div>
-  </div>
 
   <!-- Templates -->
   <template id="milestone-page-template-rookie">
@@ -214,7 +216,7 @@
   <template id="milestone-item-template-rookie">
     <div class="milestone-item" data-id="">
       <div class="milestone-stamp-container">
-        <img src="public/images/certified-teal.png" alt="Certified" class="certified-img rookie-stamp">
+        <img src="public/certified-teal.png" alt="Certified" class="certified-img rookie-stamp">
       </div>
       <div class="milestone-content">
         <div class="milestone-number gold-text">MILESTONE <span class="milestone-num"></span> :</div>
@@ -227,7 +229,7 @@
   <template id="milestone-item-template-experienced">
     <div class="milestone-item" data-id="">
       <div class="milestone-stamp-container">
-        <img src="public/images/certified-gold.png" alt="Certified" class="certified-img experienced-stamp">
+        <img src="public/certified-gold.png" alt="Certified" class="certified-img experienced-stamp">
       </div>
       <div class="milestone-content">
         <div class="milestone-number teal-text">MILESTONE <span class="milestone-num"></span> :</div>
@@ -263,6 +265,26 @@
       <div class="modal-footer">
         <button id="modal-cancel" class="btn outline-btn">Cancel</button>
         <button id="modal-confirm" class="btn primary-btn">Confirm Change</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add a share modal -->
+  <div id="share-modal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-share-modal">&times;</span>
+      <h2>Share Your Passport</h2>
+      <p>Share your passport progress with others:</p>
+      <div class="form-group">
+        <label for="share-link">Shareable Link:</label>
+        <div class="share-link-container">
+          <input type="text" id="share-link" readonly>
+          <button id="copy-link-btn" class="btn secondary-btn">Copy</button>
+        </div>
+      </div>
+      <div class="share-options">
+        <button id="email-share-btn" class="btn outline-btn">Email</button>
+        <button id="whatsapp-share-btn" class="btn outline-btn">WhatsApp</button>
       </div>
     </div>
   </div>
