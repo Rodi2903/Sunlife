@@ -677,4 +677,35 @@ body {
     margin-bottom: 1rem;
     margin-right: 0;
   }
+  /* Add this to your styles.css file */
+.advisor-header {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.advisor-title {
+  color: var(--primary-color);
+  font-size: 1.5rem;
+  display: inline-block;
+  padding-bottom: 0.5rem;
+}
+
+.advisor-divider {
+  height: 2px;
+  background: linear-gradient(to right, transparent, var(--secondary-color), transparent);
+  margin: 0.5rem auto 1.5rem;
+  width: 80%;
+}
+
+/* Update milestone item styling for better distinction */
+.milestone-item {
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1.5rem;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
 }
