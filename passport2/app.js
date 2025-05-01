@@ -1,7 +1,7 @@
 // Configuration
 const CONFIG = {
   // Replace with your deployed Google Apps Script Web App URL
-  API_URL: "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec",
+  API_URL: "https://script.google.com/macros/s/AKfycbzPT2nZi-u0vpr5P1f0zXjdIxiMjaWVvdhbhZXatPWTeYiFJKx7jFHRKnaqPvLWCS4v/exec",
   MILESTONES_PER_PAGE: 3,
   ROOKIE_MILESTONES: [
     {
