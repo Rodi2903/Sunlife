@@ -24,7 +24,7 @@ function stamp(btn) {
 }
 
 function sendDataToSheet() {
-  fetch("https://script.google.com/macros/s/AKfycbz4SsX1iO1-fRPBu4zyI9vfFlhjzy5NujBrXtGJWVhH3zdApdNxMlKzFbR-Drn9rR58zw/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbzBIC9f7lxs3G16U5N-SzxGuTWEF8mtbH6qO-7el6nEaPDKBismET7ddqCQotygY1pEQA/exec", {
     method: "POST",
     body: JSON.stringify({
       name: advisorName,
