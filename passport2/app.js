@@ -1,7 +1,7 @@
 // Configuration
 const CONFIG = {
   // Replace with your deployed Google Apps Script Web App URL
-  API_URL: "https://script.google.com/macros/s/AKfycbycjLrj3UIZlIMEmT6uqKPPMgZ9xrDyK7ikzkEz0C8Ge8x1Dv88H6mDHFOVQbvlGFz1SA/exec",
+  API_URL: "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec",
   MILESTONES_PER_PAGE: 3,
   ROOKIE_MILESTONES: [
     {
@@ -229,7 +229,22 @@ async function handleAccessPassport() {
   } catch (error) {
     console.error("Error accessing passport:", error)
     hideLoading()
-    showError("Failed to access passport. Please try again. Error: " + (error.message || "Unknown error"))
+
+    // Show more detailed error message
+    let errorMessage = "Failed to access passport. "
+
+    if (error.message.includes("Failed to fetch")) {
+      errorMessage +=
+        "Cannot connect to the server. Please check your internet connection and verify the API URL is correct."
+    } else if (error.message.includes("NetworkError")) {
+      errorMessage += "Network error. This might be due to CORS restrictions or server unavailability."
+    } else if (error.message.includes("SyntaxError")) {
+      errorMessage += "Received invalid response from server. The API might not be working correctly."
+    } else {
+      errorMessage += error.message || "Unknown error occurred."
+    }
+
+    showError(errorMessage)
   }
 }
 
@@ -257,6 +272,19 @@ function isValidEmail(email) {
 async function getAdvisorData(email) {
   try {
     console.log("Fetching advisor data for:", email)
+    console.log("Using API URL:", CONFIG.API_URL)
+
+    // First, test the connection
+    const testResponse = await fetch(`${CONFIG.API_URL}?action=test`)
+    if (!testResponse.ok) {
+      console.error("Test connection failed:", testResponse.status, testResponse.statusText)
+      throw new Error(`API test failed with status: ${testResponse.status}`)
+    }
+
+    const testData = await testResponse.json()
+    console.log("API test successful:", testData)
+
+    // Now proceed with the actual request
     const response = await fetch(`${CONFIG.API_URL}?action=getAdvisor&email=${encodeURIComponent(email)}`)
 
     if (!response.ok) {
@@ -559,25 +587,35 @@ function initializeTurnJs() {
     return
   }
 
+  // Check if Turn.js is already initialized
   if ($(elements.passportBook).data().turn) {
-    $(elements.passportBook).turn("destroy")
+    try {
+      $(elements.passportBook).turn("destroy")
+    } catch (error) {
+      console.error("Error destroying Turn.js:", error)
+    }
   }
 
-  $(elements.passportBook).turn({
-    width: "100%",
-    height: "100%",
-    autoCenter: true,
-    display: "double",
-    acceleration: true,
-    elevation: 50,
-    gradients: true,
-    when: {
-      turning: (e, page) => {
-        state.currentPage = page
-        elements.currentPageDisplay.textContent = page
+  try {
+    $(elements.passportBook).turn({
+      width: "100%",
+      height: "100%",
+      autoCenter: true,
+      display: "double",
+      acceleration: true,
+      elevation: 50,
+      gradients: true,
+      when: {
+        turning: (e, page) => {
+          state.currentPage = page
+          elements.currentPageDisplay.textContent = page
+        },
       },
-    },
-  })
+    })
+  } catch (error) {
+    console.error("Error initializing Turn.js:", error)
+    return // Exit the function if Turn.js fails to initialize
+  }
 
   // Responsive adjustments
   $(window).resize(() => {
