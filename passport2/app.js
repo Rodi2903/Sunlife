@@ -1,7 +1,7 @@
 // Configuration
 const CONFIG = {
   // Replace with your deployed Google Apps Script Web App URL
-  API_URL: "https://script.google.com/macros/s/AKfycbxZBAR6Q0_9zc2RmOM1K4U4QluiuK8zGhrqJ3GWvX_3fYxVRuUKbVN-KOoYXSnU_b7I/exec",
+  API_URL: "https://script.google.com/macros/s/AKfycbycjLrj3UIZlIMEmT6uqKPPMgZ9xrDyK7ikzkEz0C8Ge8x1Dv88H6mDHFOVQbvlGFz1SA/exec",
   MILESTONES_PER_PAGE: 3,
   ROOKIE_MILESTONES: [
     {
@@ -229,7 +229,7 @@ async function handleAccessPassport() {
   } catch (error) {
     console.error("Error accessing passport:", error)
     hideLoading()
-    showError("Failed to access passport. Please try again.")
+    showError("Failed to access passport. Please try again. Error: " + (error.message || "Unknown error"))
   }
 }
 
@@ -256,12 +256,20 @@ function isValidEmail(email) {
 // API Functions
 async function getAdvisorData(email) {
   try {
+    console.log("Fetching advisor data for:", email)
     const response = await fetch(`${CONFIG.API_URL}?action=getAdvisor&email=${encodeURIComponent(email)}`)
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
     const data = await response.json()
+    console.log("API response:", data)
 
     if (data.success) {
       return data.advisor
     } else {
+      console.log("Advisor not found:", data.message)
       return null
     }
   } catch (error) {
@@ -272,6 +280,7 @@ async function getAdvisorData(email) {
 
 async function saveAdvisorData(advisorData) {
   try {
+    console.log("Saving advisor data:", advisorData)
     const response = await fetch(CONFIG.API_URL, {
       method: "POST",
       headers: {
@@ -283,7 +292,12 @@ async function saveAdvisorData(advisorData) {
       }),
     })
 
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
     const data = await response.json()
+    console.log("Save response:", data)
 
     if (data.success) {
       return data.advisor
@@ -311,6 +325,10 @@ async function updateMilestone(email, milestoneId, isCompleted) {
         dateCompleted: isCompleted ? new Date().toISOString() : null,
       }),
     })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
 
     const data = await response.json()
 
@@ -342,6 +360,10 @@ async function updateAdvisorType(email, newType) {
             : initializeMilestones(CONFIG.EXPERIENCED_MILESTONES),
       }),
     })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
 
     const data = await response.json()
 
