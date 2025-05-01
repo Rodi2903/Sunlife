@@ -16,6 +16,15 @@
   --error-color: #ef4444;
 }
 
+/* Font styles */
+.playfair {
+  font-family: "Playfair Display", serif;
+}
+
+.lekton {
+  font-family: "Lekton", sans-serif;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -273,6 +282,7 @@ body {
 }
 
 .cover-content h1 {
+  font-family: "Playfair Display", serif;
   font-size: 3rem;
   color: var(--secondary-color);
   letter-spacing: 4px;
@@ -286,6 +296,7 @@ body {
 }
 
 .cover-content h2 {
+  font-family: "Lekton", sans-serif;
   font-size: 1.5rem;
   color: var(--secondary-color);
   letter-spacing: 2px;
@@ -293,6 +304,7 @@ body {
 }
 
 .cover-content h3 {
+  font-family: "Playfair Display", serif;
   font-size: 1.5rem;
   color: var(--secondary-color);
   letter-spacing: 2px;
@@ -300,6 +312,7 @@ body {
 }
 
 .back-title {
+  font-family: "Lekton", sans-serif;
   font-size: 1rem;
   color: var(--secondary-color);
   letter-spacing: 1px;
@@ -748,6 +761,26 @@ body {
   margin-bottom: 2rem;
 }
 
+.data-info {
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: rgba(0, 65, 101, 0.05);
+  border-radius: 4px;
+  border-left: 3px solid var(--primary-color);
+}
+
+.data-info h3 {
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.data-info p {
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+
 .progress-info {
   margin-bottom: 0.5rem;
   text-align: center;
@@ -921,6 +954,39 @@ body {
 /* Utility Classes */
 .hidden {
   display: none !important;
+}
+
+/* Enhanced page turning effects */
+.passport-book .page-wrapper {
+  perspective: 2000px;
+}
+
+.passport-book .shadow {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.passport-book .page-bending {
+  box-shadow: -5px 5px 20px rgba(0, 0, 0, 0.2);
+  transition: box-shadow 0.3s ease;
+}
+
+.passport-book .even.page-bending {
+  box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+.passport-book .page-wrapper.animated {
+  transition: transform 0.5s, box-shadow 0.35s;
+}
+
+/* Print button styles */
+.print-btn {
+  background-color: var(--primary-color);
+  color: var(--white);
+  margin-left: 1rem;
+}
+
+.print-btn:hover {
+  background-color: var(--primary-dark);
 }
 
 /* Responsive Styles */

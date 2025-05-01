@@ -1,68 +1,24 @@
 // Milestone data for different advisor levels
 const milestonesData = {
-  rookie: [
-    {
-      id: "powerboost",
-      title: "POWERBOOST",
-      description: "Complete the PowerBoost training program for new advisors.",
-    },
-    {
-      id: "start",
-      title: "START",
-      description: "Complete the START onboarding program.",
-    },
-    {
-      id: "4pillars",
-      title: "4PILLARS",
-      description: "Master the 4 Pillars of financial planning.",
-    },
-    {
-      id: "jfw",
-      title: "JFW",
-      description: "Complete the Journey to Financial Wellness training.",
-    },
-    {
-      id: "90k",
-      title: "90K VALIDATION",
-      description: "Achieve 90K validation milestone.",
-    },
-    {
-      id: "products",
-      title: "PRODUCTS MASTERCLASS",
-      description: "Complete the Products Masterclass training.",
-    },
+  advisorA: [
+    { id: "a1", title: "POWERBOOST", description: "Complete the PowerBoost training program" },
+    { id: "a2", title: "START", description: "Complete the START onboarding program" },
+    { id: "a3", title: "4PILLARS", description: "Master the 4 Pillars of financial planning" },
+    { id: "a4", title: "JFW", description: "Complete the Journey to Financial Wellness training" },
+    { id: "a5", title: "90K VALIDATION", description: "Achieve 90K validation milestone" },
+    { id: "a6", title: "PRODUCTS MASTERCLASS", description: "Complete the Products Masterclass training" },
   ],
-  experienced: [
+  advisorB: [
+    { id: "b1", title: "VUL ADVANCE", description: "Complete the Variable Universal Life advanced training" },
+    { id: "b2", title: "POWERBOOST/APEX", description: "Complete the PowerBoost/APEX advanced program" },
     {
-      id: "vul-advance",
-      title: "VUL ADVANCE",
-      description: "Complete the Variable Universal Life advanced training.",
-    },
-    {
-      id: "powerboost-apex",
-      title: "POWERBOOST/APEX",
-      description: "Complete the PowerBoost/APEX advanced program.",
-    },
-    {
-      id: "uw-essentials",
+      id: "b3",
       title: "UW ESSENTIALS",
-      description: "Complete the Underwriting Essentials training (if applicable).",
+      description: "Complete the Underwriting Essentials training (if applicable)",
     },
-    {
-      id: "sunny-level",
-      title: "SUNNY LEVEL UP",
-      description: "Complete the Sunny Level Up program (if applicable).",
-    },
-    {
-      id: "1st-medallion",
-      title: "1ST MEDALLION",
-      description: "Achieve your first Medallion recognition.",
-    },
-    {
-      id: "180k",
-      title: "180K VALIDATION",
-      description: "Achieve 180K validation milestone.",
-    },
+    { id: "b4", title: "SUNNY LEVEL UP", description: "Complete the Sunny Level Up program (if applicable)" },
+    { id: "b5", title: "1ST MEDALLION", description: "Achieve your first Medallion recognition" },
+    { id: "b6", title: "180K VALIDATION", description: "Achieve 180K validation milestone" },
   ],
 }
 
@@ -110,7 +66,7 @@ const milestoneItemTemplateRookie = document.getElementById("milestone-item-temp
 const milestoneItemTemplateExperienced = document.getElementById("milestone-item-template-experienced")
 
 // Current user data
-let currentUser = null
+const currentUser = null
 
 // Remove the ES6 import statement
 // Replace this line:
@@ -118,567 +74,591 @@ let currentUser = null
 // The jQuery variable is already available from the CDN
 const $ = window.jQuery
 
-// Initialize the application
+// User data
+let userData = {
+  name: "",
+  email: "",
+  completedMilestones: [],
+  lastUpdated: new Date().toISOString(),
+  level: "rookie", // Default level
+}
+
+// Initialize the application when the DOM is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
-  init()
-  checkForSharedPassport()
-})
+  // DOM Elements
+  const authContainer = document.getElementById("auth-container")
+  const loadingContainer = document.getElementById("loading-container")
+  const passportContainer = document.getElementById("passport-container")
+  const passportControls = document.getElementById("passport-controls")
+  const passportBook = document.getElementById("passport-book")
+  const milestonesPages = document.getElementById("milestones-pages")
+  const accessPassportBtn = document.getElementById("access-passport-btn")
+  const advisorEmail = document.getElementById("advisor-email")
+  const advisorName = document.getElementById("advisor-name")
+  const advisorType = document.getElementById("advisor-type")
+  const authMessage = document.getElementById("auth-message")
+  const prevBtn = document.getElementById("prev-btn")
+  const nextBtn = document.getElementById("next-btn")
+  const printBtn = document.getElementById("print-btn")
+  const shareBtn = document.getElementById("share-btn")
+  const currentPage = document.getElementById("current-page")
+  const totalPages = document.getElementById("total-pages")
+  const notification = document.getElementById("notification")
+  const notificationMessage = document.getElementById("notification-message")
+  const notificationClose = document.getElementById("notification-close")
+  const shareModal = document.getElementById("share-modal")
+  const closeShareModal = document.querySelector(".close-share-modal")
+  const copyLinkBtn = document.getElementById("copy-link-btn")
+  const shareLink = document.getElementById("share-link")
+  const modal = document.getElementById("modal")
+  const modalTitle = document.getElementById("modal-title")
+  const modalBody = document.getElementById("modal-body")
+  const modalCancel = document.getElementById("modal-cancel")
+  const modalConfirm = document.getElementById("modal-confirm")
+  const closeModal = document.querySelector(".close-modal")
+  const logoutBtn = document.getElementById("logout-btn")
 
-// Add event listeners for share and download buttons
-function init() {
-  // Check if user is already logged in
-  const savedUser = localStorage.getItem("sunLifePassportUser")
-  if (savedUser) {
-    currentUser = JSON.parse(savedUser)
-    loadPassport()
-  }
+  // Display Elements
+  const displayName = document.getElementById("display-name")
+  const displayEmail = document.getElementById("display-email")
+  const displayLevel = document.getElementById("display-level")
+  const displayPassportId = document.getElementById("display-passport-id")
+  const displayLastUpdated = document.getElementById("display-last-updated")
+  const progressText = document.getElementById("progress-text")
+  const progressBar = document.getElementById("progress-bar")
 
-  // Event listeners
-  accessPassportBtn.addEventListener("click", handleAccessPassport)
-  prevBtn.addEventListener("click", () => {
-    $("#passport-book").turn("previous")
-  })
-  nextBtn.addEventListener("click", () => {
-    $("#passport-book").turn("next")
-  })
-  notificationClose.addEventListener("click", hideNotification)
-  closeModal.addEventListener("click", hideModal)
-  modalCancel.addEventListener("click", hideModal)
-  modalConfirm.addEventListener("click", handleModalConfirm)
-  changeLevelBtn.addEventListener("click", showChangeLevelModal)
-  logoutBtn.addEventListener("click", handleLogout)
+  // Templates
+  const milestonePageTemplateRookie = document.getElementById("milestone-page-template-rookie")
+  const milestonePageTemplateExperienced = document.getElementById("milestone-page-template-experienced")
+  const milestoneItemTemplateRookie = document.getElementById("milestone-item-template-rookie")
+  const milestoneItemTemplateExperienced = document.getElementById("milestone-item-template-experienced")
 
-  // Add event listeners for share and download
-  document.getElementById("share-btn").addEventListener("click", showShareModal)
-  document.getElementById("download-btn").addEventListener("click", downloadPassport)
-  document.getElementById("copy-link-btn").addEventListener("click", copyShareLink)
-  document.getElementById("email-share-btn").addEventListener("click", shareViaEmail)
-  document.getElementById("whatsapp-share-btn").addEventListener("click", shareViaWhatsApp)
-  document.querySelector(".close-share-modal").addEventListener("click", hideShareModal)
-}
-
-// Handle access passport button click
-function handleAccessPassport() {
-  const email = advisorEmail.value.trim()
-  const name = advisorName.value.trim()
-  const level = advisorType.value
-
-  if (!email || !name) {
-    showAuthError("Please fill in all fields.")
-    return
-  }
-
-  if (!isValidEmail(email)) {
-    showAuthError("Please enter a valid email address.")
-    return
-  }
-
-  showLoading()
-
-  // Simulate API call
-  setTimeout(() => {
+  // Initialize the flipbook
+  function initializeFlipbook() {
     try {
-      // Check if user exists
-      const existingUser = localStorage.getItem(`sunLifePassport_${email}`)
+      // Check if jQuery and turn.js are loaded
+      if (typeof jQuery === "undefined") {
+        console.error("jQuery is not loaded")
+        return
+      }
 
-      if (existingUser) {
-        currentUser = JSON.parse(existingUser)
-        // Update name if it changed
-        if (currentUser.name !== name) {
-          currentUser.name = name
-          saveUserData()
-        }
-      } else {
-        // Create new user
-        const passportId = generatePassportId()
-        currentUser = {
-          email,
-          name,
-          level,
-          passportId,
-          milestones: {},
-          lastUpdated: new Date().toISOString(),
-        }
+      if (typeof jQuery.fn.turn === "undefined") {
+        console.error("turn.js is not loaded")
+        return
+      }
 
-        // Initialize milestones for BOTH advisor levels as not completed
-        Object.entries(milestonesData).forEach(([levelKey, levelMilestones]) => {
-          levelMilestones.forEach((milestone) => {
-            const uniqueMilestoneId = `${levelKey}_${milestone.id}`
-            currentUser.milestones[uniqueMilestoneId] = {
-              completed: false,
-              completedDate: null,
+      // Check if the passport book element exists
+      if (!passportBook) {
+        console.error("Passport book element not found")
+        return
+      }
+
+      // Initialize turn.js with enhanced animation settings
+      jQuery(passportBook).turn({
+        width: passportContainer.offsetWidth * 0.9,
+        height: 600,
+        autoCenter: true,
+        gradients: true,
+        acceleration: true,
+        elevation: 50,
+        duration: 1000,
+        display: "double",
+        when: {
+          turning: (event, page, view) => {
+            if (currentPage) {
+              currentPage.textContent = page
             }
-          })
-        })
+          },
+          turned: function (event, page, view) {
+            if (totalPages) {
+              totalPages.textContent = jQuery(this).turn("pages")
+            }
+          },
+        },
+      })
 
-        saveUserData()
-      }
-
-      loadPassport()
+      // Make the flipbook responsive
+      window.addEventListener(
+        "resize",
+        debounce(() => {
+          if (passportContainer && passportBook) {
+            const width = passportContainer.offsetWidth * 0.9
+            const height = Math.min(window.innerHeight * 0.7, 600)
+            jQuery(passportBook).turn("size", width, height)
+          }
+        }, 200),
+      )
     } catch (error) {
-      // Handle any errors that might occur
-      hideLoading()
-      showAuthError("An error occurred while accessing your passport. Please try again.")
-      console.error("Passport access error:", error)
+      console.error("Error initializing flipbook:", error)
     }
-  }, 1500)
-}
-
-// Load the passport
-function loadPassport() {
-  try {
-    updateUserInfo()
-    generateMilestonePages()
-
-    // Hide auth and loading, show passport
-    authContainer.classList.add("hidden")
-    loadingContainer.classList.add("hidden")
-    passportContainer.classList.remove("hidden")
-    passportControls.classList.remove("hidden")
-
-    // Initialize turn.js
-    initTurnJs()
-
-    // Save current user to session
-    localStorage.setItem("sunLifePassportUser", JSON.stringify(currentUser))
-  } catch (error) {
-    hideLoading()
-    showAuthError("Failed to load passport. Please try again.")
-    console.error("Passport load error:", error)
-  }
-}
-
-// Initialize turn.js
-function initTurnJs() {
-  // Destroy if already initialized
-  if ($("#passport-book").data().turn) {
-    $("#passport-book").turn("destroy")
   }
 
-  // Initialize turn.js
-  $("#passport-book").turn({
-    width: passportContainer.offsetWidth,
-    height: passportBook.offsetHeight,
-    autoCenter: true,
-    gradients: true,
-    acceleration: true,
-    elevation: 50,
-    when: {
-      turning: (event, page, view) => {
-        currentPage.textContent = page
-      },
-      turned: (event, page, view) => {
-        currentPage.textContent = page
-      },
-    },
-  })
+  // Generate milestone pages
+  function generateMilestonePages() {
+    if (!milestonesPages) return
 
-  // Update total pages
-  const totalPagesCount = $("#passport-book").turn("pages")
-  totalPages.textContent = totalPagesCount
+    // Clear existing milestone pages
+    milestonesPages.innerHTML = ""
 
-  // Handle window resize
-  window.addEventListener(
-    "resize",
-    debounce(() => {
-      $("#passport-book").turn("size", passportContainer.offsetWidth, passportBook.offsetHeight)
-    }, 200),
-  )
-}
+    // Create Advisor A milestone pages (1-3)
+    const advisorAPage1 = document.createElement("div")
+    advisorAPage1.innerHTML = `
+      <div class="page-content wave-bg milestone-page">
+        <div class="binding-effect left"></div>
+        <div class="advisor-header rookie">
+          <h2 class="advisor-title">ADVISOR A <span class="gold-text">(ROOKIE)</span></h2>
+          <div class="advisor-divider rookie-divider"></div>
+        </div>
+        <div class="milestones-grid">
+          ${generateMilestoneItems(milestonesData.advisorA.slice(0, 3), "rookie")}
+        </div>
+      </div>
+    `
+    milestonesPages.appendChild(advisorAPage1)
 
-// Generate milestone pages
-function generateMilestonePages() {
-  // Clear existing pages
-  milestonesPages.innerHTML = ""
+    // Create Advisor A milestone pages (4-6)
+    const advisorAPage2 = document.createElement("div")
+    advisorAPage2.innerHTML = `
+      <div class="page-content wave-bg milestone-page">
+        <div class="binding-effect right"></div>
+        <div class="advisor-header rookie">
+          <h2 class="advisor-title">ADVISOR A <span class="gold-text">(ROOKIE)</span></h2>
+          <div class="advisor-divider rookie-divider"></div>
+        </div>
+        <div class="milestones-grid">
+          ${generateMilestoneItems(milestonesData.advisorA.slice(3, 6), "rookie")}
+        </div>
+      </div>
+    `
+    milestonesPages.appendChild(advisorAPage2)
 
-  // We'll display milestones for both advisor levels
-  const advisorLevels = [
-    {
-      level: "rookie",
-      template: milestonePageTemplateRookie,
-      itemTemplate: milestoneItemTemplateRookie,
-      milestones: milestonesData.rookie,
-    },
-    {
-      level: "experienced",
-      template: milestonePageTemplateExperienced,
-      itemTemplate: milestoneItemTemplateExperienced,
-      milestones: milestonesData.experienced,
-    },
-  ]
+    // Create Advisor B milestone pages (1-3)
+    const advisorBPage1 = document.createElement("div")
+    advisorBPage1.innerHTML = `
+      <div class="page-content wave-bg milestone-page">
+        <div class="binding-effect left"></div>
+        <div class="advisor-header experienced">
+          <h2 class="advisor-title">ADVISOR B <span class="gold-text">(1.5 YR - 2 YEARS)</span></h2>
+          <div class="advisor-divider experienced-divider"></div>
+        </div>
+        <div class="milestones-grid">
+          ${generateMilestoneItems(milestonesData.advisorB.slice(0, 3), "experienced")}
+        </div>
+      </div>
+    `
+    milestonesPages.appendChild(advisorBPage1)
 
-  // Create pages for each advisor level
-  advisorLevels.forEach((advisorLevel) => {
-    // Calculate how many milestones per page (3 per page as in the design)
-    const milestonesPerPage = 3
+    // Create Advisor B milestone pages (4-6)
+    const advisorBPage2 = document.createElement("div")
+    advisorBPage2.innerHTML = `
+      <div class="page-content wave-bg milestone-page">
+        <div class="binding-effect right"></div>
+        <div class="advisor-header experienced">
+          <h2 class="advisor-title">ADVISOR B <span class="gold-text">(1.5 YR - 2 YEARS)</span></h2>
+          <div class="advisor-divider experienced-divider"></div>
+        </div>
+        <div class="milestones-grid">
+          ${generateMilestoneItems(milestonesData.advisorB.slice(3, 6), "experienced")}
+        </div>
+      </div>
+    `
+    milestonesPages.appendChild(advisorBPage2)
 
-    // Calculate how many pages we need for this level
-    const pageCount = Math.ceil(advisorLevel.milestones.length / milestonesPerPage)
+    // Add click event listeners to milestone items
+    document.querySelectorAll(".milestone-item").forEach((item) => {
+      item.addEventListener("click", function () {
+        const milestoneId = this.getAttribute("data-id")
+        toggleMilestoneCompletion(milestoneId)
+      })
+    })
+  }
 
-    // Create pages for this advisor level
-    for (let i = 0; i < pageCount; i++) {
-      const pageClone = advisorLevel.template.content.cloneNode(true)
-      const milestonesGrid = pageClone.querySelector(".milestones-grid")
-
-      // Add milestones to this page
-      const startIndex = i * milestonesPerPage
-      const endIndex = Math.min(startIndex + milestonesPerPage, advisorLevel.milestones.length)
-
-      for (let j = startIndex; j < endIndex; j++) {
-        const milestone = advisorLevel.milestones[j]
-        const milestoneClone = advisorLevel.itemTemplate.content.cloneNode(true)
-
-        const milestoneItem = milestoneClone.querySelector(".milestone-item")
-        const milestoneTitle = milestoneClone.querySelector(".milestone-title")
-        const milestoneDescription = milestoneClone.querySelector(".milestone-description")
-        const milestoneNum = milestoneClone.querySelector(".milestone-num")
-        const certifiedStamp = milestoneClone.querySelector(`.${advisorLevel.level}-stamp`)
-
-        // Create a unique ID that includes the advisor level
-        const uniqueMilestoneId = `${advisorLevel.level}_${milestone.id}`
-
-        milestoneItem.dataset.id = uniqueMilestoneId
-        milestoneTitle.textContent = milestone.title
-        milestoneDescription.textContent = milestone.description
-        milestoneNum.textContent = j + 1
-
-        // Check if milestone is completed
-        if (currentUser.milestones[uniqueMilestoneId]?.completed) {
-          certifiedStamp.classList.add("completed")
+  // Generate milestone items HTML
+  function generateMilestoneItems(milestones, type) {
+    return milestones
+      .map((milestone, index) => {
+        // Initialize completedMilestones array if it doesn't exist
+        if (!userData.completedMilestones) {
+          userData.completedMilestones = []
         }
 
-        // Add click event to toggle milestone completion
-        milestoneItem.addEventListener("click", () =>
-          toggleMilestone(uniqueMilestoneId, advisorLevel.level, milestone.title),
-        )
+        const isCompleted = userData.completedMilestones.includes(milestone.id)
+        const completedClass = isCompleted ? "completed" : ""
+        const stampImage = type === "rookie" ? "public/certified-teal.png" : "public/certified-gold.png"
+        const milestoneNumber = index + 1
+        const numberClass = type === "rookie" ? "gold-text" : "teal-text"
 
-        milestonesGrid.appendChild(milestoneClone)
+        return `
+        <div class="milestone-item" data-id="${milestone.id}">
+          <div class="milestone-stamp-container">
+            <img src="${stampImage}" alt="Certified" class="certified-img ${type}-stamp ${completedClass}">
+          </div>
+          <div class="milestone-content">
+            <div class="milestone-number ${numberClass}">MILESTONE ${milestoneNumber} :</div>
+            <h3 class="milestone-title">${milestone.title}</h3>
+            <p class="milestone-description">${milestone.description}</p>
+          </div>
+        </div>
+      `
+      })
+      .join("")
+  }
+
+  // Toggle milestone completion
+  function toggleMilestoneCompletion(milestoneId) {
+    // Initialize completedMilestones array if it doesn't exist
+    if (!userData.completedMilestones) {
+      userData.completedMilestones = []
+    }
+
+    const index = userData.completedMilestones.indexOf(milestoneId)
+
+    if (index === -1) {
+      // Add to completed milestones
+      userData.completedMilestones.push(milestoneId)
+      const certifiedImg = document.querySelector(`.milestone-item[data-id="${milestoneId}"] .certified-img`)
+      if (certifiedImg) {
+        certifiedImg.classList.add("completed")
       }
-
-      milestonesPages.appendChild(pageClone)
+      showNotification("Milestone completed!")
+    } else {
+      // Remove from completed milestones
+      userData.completedMilestones.splice(index, 1)
+      const certifiedImg = document.querySelector(`.milestone-item[data-id="${milestoneId}"] .certified-img`)
+      if (certifiedImg) {
+        certifiedImg.classList.remove("completed")
+      }
+      showNotification("Milestone marked as incomplete")
     }
-  })
 
-  // Update progress
-  updateProgress()
-}
+    // Update progress
+    updateProgress()
 
-// Toggle milestone completion
-function toggleMilestone(milestoneId, advisorLevel, milestoneTitle) {
-  // Ensure the milestone exists in the user's data
-  if (!currentUser.milestones[milestoneId]) {
-    currentUser.milestones[milestoneId] = {
-      completed: false,
-      completedDate: null,
+    // Update last updated timestamp
+    userData.lastUpdated = new Date().toISOString()
+    if (displayLastUpdated) {
+      displayLastUpdated.textContent = formatDate(userData.lastUpdated)
     }
-  }
-
-  const milestone = currentUser.milestones[milestoneId]
-
-  milestone.completed = !milestone.completed
-  milestone.completedDate = milestone.completed ? new Date().toISOString() : null
-
-  // Update UI
-  const milestoneItem = document.querySelector(`.milestone-item[data-id="${milestoneId}"]`)
-  const certifiedStamp = milestoneItem.querySelector(`.${advisorLevel}-stamp`)
-
-  if (milestone.completed) {
-    certifiedStamp.classList.add("completed")
-    showNotification(
-      `${advisorLevel === "rookie" ? "Advisor A" : "Advisor B"} Milestone "${milestoneTitle}" completed!`,
-    )
-  } else {
-    certifiedStamp.classList.remove("completed")
-    showNotification(
-      `${advisorLevel === "rookie" ? "Advisor A" : "Advisor B"} Milestone "${milestoneTitle}" marked as incomplete.`,
-    )
-  }
-
-  // Update last updated date
-  currentUser.lastUpdated = new Date().toISOString()
-  displayLastUpdated.textContent = formatDate(currentUser.lastUpdated)
-
-  // Update progress
-  updateProgress()
-
-  // Save user data
-  saveUserData()
-}
-
-// Update progress bar and text
-function updateProgress() {
-  // Count completed milestones for the current user's level
-  const currentLevelMilestones = Object.keys(currentUser.milestones).filter((key) => key.startsWith(currentUser.level))
-
-  const completedCount = currentLevelMilestones.filter((key) => currentUser.milestones[key]?.completed).length
-
-  const totalCount = milestonesData[currentUser.level].length
-  const percentage = (completedCount / totalCount) * 100
-
-  progressBar.style.width = `${percentage}%`
-  progressText.textContent = `${completedCount} of ${totalCount} milestones completed for your level`
-}
-
-// Update user info in the passport
-function updateUserInfo() {
-  // Update personal info page
-  displayName.textContent = currentUser.name
-  displayEmail.textContent = currentUser.email
-  displayLevel.textContent = currentUser.level === "rookie" ? "Advisor A (Rookie)" : "Advisor B (1.5-2 years)"
-  displayPassportId.textContent = currentUser.passportId
-  displayLastUpdated.textContent = formatDate(currentUser.lastUpdated)
-}
-
-// Show change level modal
-function showChangeLevelModal() {
-  modalTitle.textContent = "Change Advisor Level"
-  modalBody.innerHTML = `
-    <p>Changing your advisor level will update your profile but preserve your milestone progress for both levels.</p>
-    <div class="form-group">
-      <label for="new-advisor-type">Select New Level:</label>
-      <select id="new-advisor-type">
-        <option value="rookie" ${currentUser.level === "rookie" ? "selected" : ""}>Advisor A (Rookie) (0-1.5 years)</option>
-        <option value="experienced" ${currentUser.level === "experienced" ? "selected" : ""}>Advisor B (1.5-2 years)</option>
-      </select>
-    </div>
-  `
-
-  modal.classList.remove("hidden")
-}
-
-// Handle modal confirm button
-function handleModalConfirm() {
-  const newAdvisorType = document.getElementById("new-advisor-type").value
-
-  if (newAdvisorType !== currentUser.level) {
-    // Change level but don't reset milestones
-    currentUser.level = newAdvisorType
-
-    // Update last updated date
-    currentUser.lastUpdated = new Date().toISOString()
 
     // Save user data
     saveUserData()
-
-    // Reload passport
-    loadPassport()
-
-    // Show notification
-    showNotification("Advisor level changed successfully. Your milestones have been preserved.")
   }
 
-  hideModal()
-}
+  // Update progress display
+  function updateProgress() {
+    if (!progressBar || !progressText) return
 
-// Handle logout
-function handleLogout() {
-  // Remove current user from session
-  localStorage.removeItem("sunLifePassportUser")
-  currentUser = null
+    const totalMilestones = milestonesData.advisorA.length + milestonesData.advisorB.length
+    const completedCount = userData.completedMilestones ? userData.completedMilestones.length : 0
+    const progressPercentage = (completedCount / totalMilestones) * 100
 
-  // Show auth container, hide passport
-  authContainer.classList.remove("hidden")
-  passportContainer.classList.add("hidden")
-  passportControls.classList.add("hidden")
-
-  // Clear form
-  advisorEmail.value = ""
-  advisorName.value = ""
-  advisorType.value = "rookie"
-  authMessage.textContent = ""
-  authMessage.classList.remove("error", "success")
-}
-
-// Save user data to localStorage
-function saveUserData() {
-  localStorage.setItem(`sunLifePassport_${currentUser.email}`, JSON.stringify(currentUser))
-  localStorage.setItem("sunLifePassportUser", JSON.stringify(currentUser))
-}
-
-// Show loading container
-function showLoading() {
-  authContainer.classList.add("hidden")
-  loadingContainer.classList.remove("hidden")
-}
-
-// Hide loading container
-function hideLoading() {
-  loadingContainer.classList.add("hidden")
-  authContainer.classList.remove("hidden")
-}
-
-// Show auth error
-function showAuthError(message) {
-  authMessage.textContent = message
-  authMessage.classList.add("error")
-  authMessage.classList.remove("success")
-}
-
-// Show notification
-function showNotification(message) {
-  notificationMessage.textContent = message
-  notification.classList.remove("hidden")
-
-  // Auto hide after 3 seconds
-  setTimeout(hideNotification, 3000)
-}
-
-// Hide notification
-function hideNotification() {
-  notification.classList.add("hidden")
-}
-
-// Hide modal
-function hideModal() {
-  modal.classList.add("hidden")
-}
-
-// Generate passport ID
-function generatePassportId() {
-  return "SL-" + Math.random().toString(36).substring(2, 8).toUpperCase()
-}
-
-// Format date
-function formatDate(dateString) {
-  const date = new Date(dateString)
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  })
-}
-
-// Validate email
-function isValidEmail(email) {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return re.test(email)
-}
-
-// Debounce function for resize events
-function debounce(func, wait) {
-  let timeout
-  return function () {
-    const args = arguments
-    clearTimeout(timeout)
-    timeout = setTimeout(() => {
-      func.apply(this, args)
-    }, wait)
-  }
-}
-
-// Show share modal
-function showShareModal() {
-  if (!currentUser) return
-
-  // Generate a shareable link with encoded user data
-  const shareData = {
-    id: currentUser.passportId,
-    name: currentUser.name,
-    level: currentUser.level,
-    progress: calculateProgress(),
+    progressBar.style.width = `${progressPercentage}%`
+    progressText.textContent = `${completedCount} of ${totalMilestones} milestones completed`
   }
 
-  const shareLink = `${window.location.origin}${window.location.pathname}?share=${btoa(JSON.stringify(shareData))}`
-  document.getElementById("share-link").value = shareLink
-
-  document.getElementById("share-modal").classList.remove("hidden")
-}
-
-// Hide share modal
-function hideShareModal() {
-  document.getElementById("share-modal").classList.add("hidden")
-}
-
-// Copy share link to clipboard
-function copyShareLink() {
-  const shareLink = document.getElementById("share-link")
-  shareLink.select()
-  document.execCommand("copy")
-
-  showNotification("Link copied to clipboard!")
-}
-
-// Share via email
-function shareViaEmail() {
-  if (!currentUser) return
-
-  const subject = `Check out my Sun Life Training Journey Passport`
-  const body = `Hi,
-
-I wanted to share my Sun Life Training Journey Passport with you.
-
-Name: ${currentUser.name}
-Advisor Level: ${currentUser.level === "rookie" ? "Advisor A (Rookie)" : "Advisor B (1.5-2 years)"}
-Progress: ${calculateProgress().completedCount} of ${calculateProgress().totalCount} milestones completed
-
-You can view my passport at: ${document.getElementById("share-link").value}
-
-Regards,
-${currentUser.name}`
-
-  window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-}
-
-// Share via WhatsApp
-function shareViaWhatsApp() {
-  if (!currentUser) return
-
-  const text = `Check out my Sun Life Training Journey Passport! I've completed ${calculateProgress().completedCount} of ${calculateProgress().totalCount} milestones. ${document.getElementById("share-link").value}`
-
-  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank")
-}
-
-// Download passport as PDF
-function downloadPassport() {
-  showNotification("Preparing your passport for download...")
-
-  // In a real implementation, you would use a library like html2pdf.js or jsPDF
-  // For this demo, we'll simulate the download
-  setTimeout(() => {
-    const link = document.createElement("a")
-    link.href = "#"
-    link.download = `SunLife_Passport_${currentUser.passportId}.pdf`
-    link.click()
-
-    showNotification("Your passport has been downloaded!")
-  }, 1500)
-}
-
-// Calculate progress for sharing
-function calculateProgress() {
-  const currentLevelMilestones = Object.keys(currentUser.milestones).filter((key) => key.startsWith(currentUser.level))
-  const completedCount = currentLevelMilestones.filter((key) => currentUser.milestones[key]?.completed).length
-  const totalCount = milestonesData[currentUser.level].length
-
-  return {
-    completedCount,
-    totalCount,
-    percentage: (completedCount / totalCount) * 100,
+  // Format date for display
+  function formatDate(dateString) {
+    const date = new Date(dateString)
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    })
   }
-}
 
-// Check for shared passport on page load
-function checkForSharedPassport() {
-  const urlParams = new URLSearchParams(window.location.search)
-  const shareParam = urlParams.get("share")
+  // Save user data to localStorage
+  function saveUserData() {
+    localStorage.setItem("sunLifePassportUser", JSON.stringify(userData))
+  }
 
-  if (shareParam) {
-    try {
-      const sharedData = JSON.parse(atob(shareParam))
+  // Load user data from localStorage
+  function loadUserData() {
+    const savedData = localStorage.getItem("sunLifePassportUser")
+    if (savedData) {
+      try {
+        userData = JSON.parse(savedData)
+        return true
+      } catch (error) {
+        console.error("Error parsing saved user data:", error)
+        return false
+      }
+    }
+    return false
+  }
 
-      // Display shared passport in view-only mode
-      showSharedPassport(sharedData)
-    } catch (error) {
-      console.error("Error parsing shared passport data:", error)
+  // Update personal information display
+  function updatePersonalInfo() {
+    if (displayName) displayName.textContent = userData.name || ""
+    if (displayEmail) displayEmail.textContent = userData.email || ""
+    if (displayPassportId) displayPassportId.textContent = generatePassportId(userData.email || "")
+    if (displayLastUpdated) displayLastUpdated.textContent = formatDate(userData.lastUpdated)
+    if (displayLevel) {
+      displayLevel.textContent = userData.level === "rookie" ? "Advisor A (Rookie)" : "Advisor B (1.5-2 years)"
     }
   }
-}
 
-// Show shared passport
-function showSharedPassport(sharedData) {
-  // In a real implementation, you would create a view-only version of the passport
-  // For this demo, we'll just show a notification
-  showNotification(`Viewing shared passport for ${sharedData.name}`)
-}
+  // Generate a passport ID based on email
+  function generatePassportId(email) {
+    if (!email) return "SL-PASSPORT"
+    try {
+      return "SL-" + btoa(email).substring(0, 8).toUpperCase()
+    } catch (e) {
+      return "SL-PASSPORT"
+    }
+  }
+
+  // Show notification
+  function showNotification(message) {
+    if (!notification || !notificationMessage) return
+    notificationMessage.textContent = message
+    notification.classList.remove("hidden")
+
+    // Auto hide after 3 seconds
+    setTimeout(() => {
+      hideNotification()
+    }, 3000)
+  }
+
+  // Hide notification
+  function hideNotification() {
+    if (notification) {
+      notification.classList.add("hidden")
+    }
+  }
+
+  // Debounce function for resize events
+  function debounce(func, wait) {
+    let timeout
+    return function () {
+      const args = arguments
+      clearTimeout(timeout)
+      timeout = setTimeout(() => {
+        func.apply(this, args)
+      }, wait)
+    }
+  }
+
+  // Load passport data and initialize the UI
+  function loadPassport() {
+    try {
+      // Update personal info
+      updatePersonalInfo()
+
+      // Generate milestone pages
+      generateMilestonePages()
+
+      // Update progress
+      updateProgress()
+
+      // Hide auth, show passport
+      if (authContainer) authContainer.classList.add("hidden")
+      if (loadingContainer) loadingContainer.classList.add("hidden")
+      if (passportContainer) passportContainer.classList.remove("hidden")
+      if (passportControls) passportControls.classList.remove("hidden")
+
+      // Initialize flipbook
+      setTimeout(initializeFlipbook, 100)
+    } catch (error) {
+      console.error("Error loading passport:", error)
+      if (loadingContainer) loadingContainer.classList.add("hidden")
+      if (authContainer) authContainer.classList.remove("hidden")
+      showNotification("Error loading passport. Please try again.")
+    }
+  }
+
+  // Check for shared passport
+  function checkForSharedPassport() {
+    const urlParams = new URLSearchParams(window.location.search)
+    const sharedData = urlParams.get("shared")
+
+    if (sharedData) {
+      try {
+        // Decode the shared data
+        const decodedData = JSON.parse(atob(sharedData))
+
+        // Use the shared data
+        userData = decodedData
+
+        // Initialize completedMilestones if it doesn't exist
+        if (!userData.completedMilestones) {
+          userData.completedMilestones = []
+        }
+
+        // Load the passport
+        loadPassport()
+
+        // Show notification
+        showNotification(`Viewing ${userData.name}'s passport`)
+      } catch (error) {
+        console.error("Error parsing shared data:", error)
+        showNotification("Invalid shared passport link")
+      }
+    }
+  }
+
+  // Event Listeners
+
+  // Access passport button
+  if (accessPassportBtn) {
+    accessPassportBtn.addEventListener("click", () => {
+      if (!advisorEmail || !advisorName) {
+        showNotification("Form elements not found")
+        return
+      }
+
+      // Validate inputs
+      if (!advisorName.value.trim() || !advisorEmail.value.trim()) {
+        showNotification("Please fill in all fields")
+        return
+      }
+
+      // Show loading
+      if (authContainer) authContainer.classList.add("hidden")
+      if (loadingContainer) loadingContainer.classList.remove("hidden")
+
+      // Simulate loading delay
+      setTimeout(() => {
+        // Update user data
+        userData.name = advisorName.value.trim()
+        userData.email = advisorEmail.value.trim()
+        userData.level = advisorType ? advisorType.value : "rookie"
+
+        // Initialize completedMilestones if it doesn't exist
+        if (!userData.completedMilestones) {
+          userData.completedMilestones = []
+        }
+
+        // Save user data
+        saveUserData()
+
+        // Load the passport
+        loadPassport()
+      }, 1000)
+    })
+  }
+
+  // Navigation buttons
+  if (prevBtn) {
+    prevBtn.addEventListener("click", () => {
+      try {
+        jQuery(passportBook).turn("previous")
+      } catch (error) {
+        console.error("Error navigating to previous page:", error)
+      }
+    })
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener("click", () => {
+      try {
+        jQuery(passportBook).turn("next")
+      } catch (error) {
+        console.error("Error navigating to next page:", error)
+      }
+    })
+  }
+
+  // Print button
+  if (printBtn) {
+    printBtn.addEventListener("click", () => {
+      window.print()
+    })
+  }
+
+  // Share button
+  if (shareBtn) {
+    shareBtn.addEventListener("click", () => {
+      // Generate shareable link
+      const shareData = {
+        name: userData.name,
+        email: userData.email,
+        completedMilestones: userData.completedMilestones || [],
+      }
+
+      // Create a base64 encoded string of the user data
+      try {
+        const encodedData = btoa(JSON.stringify(shareData))
+        const shareableLink = `${window.location.href.split("?")[0]}?shared=${encodedData}`
+
+        // Set the link in the input field
+        if (shareLink) {
+          shareLink.value = shareableLink
+        }
+
+        // Show the share modal
+        if (shareModal) {
+          shareModal.classList.remove("hidden")
+        }
+      } catch (error) {
+        console.error("Error creating share link:", error)
+        showNotification("Error creating share link")
+      }
+    })
+  }
+
+  // Copy link button
+  if (copyLinkBtn && shareLink) {
+    copyLinkBtn.addEventListener("click", () => {
+      shareLink.select()
+      document.execCommand("copy")
+      showNotification("Link copied to clipboard!")
+    })
+  }
+
+  // Close share modal
+  if (closeShareModal && shareModal) {
+    closeShareModal.addEventListener("click", () => {
+      shareModal.classList.add("hidden")
+    })
+  }
+
+  // Close notification
+  if (notificationClose) {
+    notificationClose.addEventListener("click", () => {
+      hideNotification()
+    })
+  }
+
+  // Logout button
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      // Clear user data
+      localStorage.removeItem("sunLifePassportUser")
+
+      // Reset form
+      if (advisorName) advisorName.value = ""
+      if (advisorEmail) advisorEmail.value = ""
+      if (advisorType) advisorType.value = "rookie"
+
+      // Hide passport, show auth
+      if (passportContainer) passportContainer.classList.add("hidden")
+      if (passportControls) passportControls.classList.add("hidden")
+      if (authContainer) authContainer.classList.remove("hidden")
+    })
+  }
+
+  // Close modal
+  if (closeModal && modal) {
+    closeModal.addEventListener("click", () => {
+      modal.classList.add("hidden")
+    })
+  }
+
+  if (modalCancel && modal) {
+    modalCancel.addEventListener("click", () => {
+      modal.classList.add("hidden")
+    })
+  }
+
+  // Initialize the application
+
+  // Check if user is already logged in or if there's a shared passport
+  if (loadUserData()) {
+    loadPassport()
+  } else {
+    // Check for shared passport
+    checkForSharedPassport()
+  }
+})

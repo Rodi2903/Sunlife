@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sun Life Training Journey Passport</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Lekton:wght@400;700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <!-- Turn.js library -->
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -32,10 +32,10 @@
           <input type="text" id="advisor-name" placeholder="Your Name" required>
         </div>
         
-        <div class="form-group">
+        <div class="form-group" style="display: none;">
           <label for="advisor-type">Advisor Level</label>
           <select id="advisor-type">
-            <option value="rookie">Advisor A (Rookie) (0-1.5 years)</option>
+            <option value="rookie">Advisor A (Rookie)</option>
             <option value="experienced">Advisor B (1.5-2 years)</option>
           </select>
         </div>
@@ -55,121 +55,111 @@
     <div id="passport-container" class="passport-container hidden">
       <!-- Passport Book -->
       <div id="passport-book" class="passport-book">
-        <!-- Cover -->
-        <div class="hard cover-front">
-          <div class="cover-content">
-            <h1>PASSPORT</h1>
-            <div class="sun-logo">
-              <img src="public/sun-life-logo.png" alt="Sun Life Logo" class="sun-life-logo-img">
-            </div>
-            <div class="cover-bottom">
-              <h2>SUNLIFE</h2>
-              <h3>TRAINING JOURNEY</h3>
-            </div>
-          </div>
-        </div>
+  <!-- Cover -->
+  <div class="hard cover-front">
+    <div class="cover-content">
+      <h1 class="playfair">PASSPORT</h1>
+      <div class="sun-logo">
+        <img src="public/sun-life-logo.png" alt="Sun Life Logo" class="sun-life-logo-img">
+      </div>
+      <div class="cover-bottom">
+        <h2 class="lekton">SUNLIFE</h2>
+        <h3 class="playfair">TRAINING JOURNEY</h3>
+      </div>
+    </div>
+  </div>
 
-        <!-- Inside Front Cover -->
-        <div class="hard inside-cover">
-          <div class="page-content wave-bg">
-            <div class="binding-effect left"></div>
-            <div class="inside-page-content">
-              <div class="sun-life-header">
-                <img src="public/sun-life-logo.png" alt="Sun Life Logo" class="sun-life-logo-img">
-                <div class="title-container">
-                  <h2 class="sunlife-title">Sun Life</h2>
-                  <h3 class="training-journey">TRAINING<br>JOURNEY</h3>
-                </div>
-              </div>
-              <div class="ribbon-container">
-                <div class="ribbon">
-                  <span>ROOKIES/ADVISORS PASSPORT</span>
-                </div>
-              </div>
-              <p class="passport-description">WHERE YOUR MILESTONES<br>WILL HAVE STAMPS.</p>
-              <div class="certified-stamp">
-                <img src="public/certified-gold.png" alt="Certified" class="certified-img">
-              </div>
-            </div>
-          </div>
+  <!-- First Page - Blank left, Logo centered on right -->
+  <div class="hard inside-cover">
+    <!-- Blank left page -->
+  </div>
+  <div>
+    <div class="page-content wave-bg">
+      <div class="binding-effect right"></div>
+      <div class="inside-page-content">
+        <div class="sun-logo">
+          <img src="public/sun-life-logo.png" alt="Sun Life Logo" class="sun-life-logo-img">
         </div>
+        <h2 class="sunlife-title lekton">Sun Life</h2>
+        <h3 class="training-journey playfair">TRAINING JOURNEY</h3>
+      </div>
+    </div>
+  </div>
 
-        <!-- Personal Information Page -->
-        <div>
-          <div class="page-content wave-bg">
-            <div class="binding-effect left"></div>
-            <h2 class="page-title">PERSONAL INFORMATION</h2>
-            
-            <div class="info-section">
-              <div class="info-row">
-                <label>Name:</label>
-                <span id="display-name"></span>
-              </div>
-              
-              <div class="info-row">
-                <label>Email:</label>
-                <span id="display-email"></span>
-              </div>
-              
-              <div class="info-row">
-                <label>Advisor Level:</label>
-                <span id="display-level"></span>
-              </div>
-              
-              <div class="info-row">
-                <label>Passport ID:</label>
-                <span id="display-passport-id"></span>
-              </div>
-              
-              <div class="info-row">
-                <label>Last Updated:</label>
-                <span id="display-last-updated"></span>
-              </div>
-            </div>
-            
-            <div class="actions-section">
-              <button id="change-level-btn" class="btn secondary-btn">Change Advisor Level</button>
-              <button id="logout-btn" class="btn outline-btn">Logout</button>
-            </div>
-          </div>
+  <!-- Progress Page and Personal Info Page -->
+  <div>
+    <div class="page-content wave-bg">
+      <div class="binding-effect left"></div>
+      <h2 class="page-title">YOUR PROGRESS</h2>
+      
+      <div class="progress-section">
+        <div class="progress-info">
+          <span id="progress-text">0 of 12 milestones completed</span>
         </div>
-
-        <!-- Milestones Pages (will be dynamically generated) -->
-        <div id="milestones-pages">
-          <!-- Milestones will be inserted here -->
-        </div>
-
-        <!-- Inside Back Cover -->
-        <div class="hard inside-cover">
-          <div class="page-content wave-bg">
-            <div class="binding-effect right"></div>
-            <h2 class="page-title">YOUR PROGRESS</h2>
-            <div class="progress-section">
-              <div class="progress-info">
-                <span id="progress-text">0 of 0 milestones completed</span>
-              </div>
-              <div class="progress-bar-container">
-                <div id="progress-bar" class="progress-bar"></div>
-              </div>
-            </div>
-            
-            <div class="completion-message">
-              <p>Continue your journey to excellence with Sun Life!</p>
-              <p>Your progress is automatically saved.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Back Cover -->
-        <div class="hard cover-back">
-          <div class="cover-content back-cover">
-            <div class="sun-logo">
-              <img src="public/sun-life-logo.png" alt="Sun Life Logo" class="sun-life-logo-img">
-            </div>
-            <p class="back-title">SUN LIFE TRAINING JOURNEY</p>
-          </div>
+        <div class="progress-bar-container">
+          <div id="progress-bar" class="progress-bar"></div>
         </div>
       </div>
+      
+      <div class="data-info">
+        <h3>Important Information</h3>
+        <p>Your progress is automatically saved to your browser and will be available when you return.</p>
+        <p>All personal information is stored locally and is not shared with any third parties.</p>
+        <p>Your data will be automatically removed after 6 months of inactivity.</p>
+        <p>This passport tracks your progress through all 12 milestones across both Advisor A and Advisor B levels.</p>
+        <p>You can share your progress with others using the Share button below.</p>
+      </div>
+    </div>
+  </div>
+  
+  <div>
+    <div class="page-content wave-bg">
+      <div class="binding-effect right"></div>
+      <h2 class="page-title">PERSONAL INFORMATION</h2>
+      
+      <div class="info-section">
+        <div class="info-row">
+          <label>Name:</label>
+          <span id="display-name"></span>
+        </div>
+        
+        <div class="info-row">
+          <label>Email:</label>
+          <span id="display-email"></span>
+        </div>
+        
+        <div class="info-row">
+          <label>Passport ID:</label>
+          <span id="display-passport-id"></span>
+        </div>
+        
+        <div class="info-row">
+          <label>Last Updated:</label>
+          <span id="display-last-updated"></span>
+        </div>
+      </div>
+      
+      <div class="actions-section">
+        <button id="logout-btn" class="btn outline-btn">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Milestones Pages (will be dynamically generated) -->
+  <div id="milestones-pages">
+    <!-- Milestones will be inserted here -->
+  </div>
+
+  <!-- Back Cover -->
+  <div class="hard cover-back">
+    <div class="cover-content back-cover">
+      <div class="sun-logo">
+        <img src="public/sun-life-logo.png" alt="Sun Life Logo" class="sun-life-logo-img">
+      </div>
+      <p class="back-title lekton">SUN LIFE TRAINING JOURNEY</p>
+    </div>
+  </div>
+</div>
     </div>
 
     <!-- Controls -->
@@ -179,7 +169,7 @@
       <span id="page-num">Page: <span id="current-page">1</span> / <span id="total-pages">6</span></span>
       <button id="next-btn" class="btn control-btn">Next</button>
       <button id="share-btn" class="btn share-btn">Share Passport</button>
-      <button id="download-btn" class="btn download-btn">Download</button>
+      <button id="print-btn" class="btn print-btn">Print</button>
     </div>
 
   <!-- Templates -->
@@ -281,10 +271,6 @@
           <input type="text" id="share-link" readonly>
           <button id="copy-link-btn" class="btn secondary-btn">Copy</button>
         </div>
-      </div>
-      <div class="share-options">
-        <button id="email-share-btn" class="btn outline-btn">Email</button>
-        <button id="whatsapp-share-btn" class="btn outline-btn">WhatsApp</button>
       </div>
     </div>
   </div>
