@@ -1,6 +1,3 @@
-// Use the libraries that are already loaded via script tags
-const $ = window.jQuery
-
 // Milestone data for different advisor levels
 const milestonesData = {
   advisorA: [
@@ -25,8 +22,60 @@ const milestonesData = {
   ],
 }
 
+// DOM Elements
+const authContainer = document.getElementById("auth-container")
+const loadingContainer = document.getElementById("loading-container")
+const passportContainer = document.getElementById("passport-container")
+const passportControls = document.getElementById("passport-controls")
+const passportBook = document.getElementById("passport-book")
+const milestonesPages = document.getElementById("milestones-pages")
+const accessPassportBtn = document.getElementById("access-passport-btn")
+const advisorEmail = document.getElementById("advisor-email")
+const advisorName = document.getElementById("advisor-name")
+const advisorType = document.getElementById("advisor-type")
+const authMessage = document.getElementById("auth-message")
+const prevBtn = document.getElementById("prev-btn")
+const nextBtn = document.getElementById("next-btn")
+const currentPage = document.getElementById("current-page")
+const totalPages = document.getElementById("total-pages")
+const notification = document.getElementById("notification")
+const notificationMessage = document.getElementById("notification-message")
+const notificationClose = document.getElementById("notification-close")
+const modal = document.getElementById("modal")
+const modalTitle = document.getElementById("modal-title")
+const modalBody = document.getElementById("modal-body")
+const modalCancel = document.getElementById("modal-cancel")
+const modalConfirm = document.getElementById("modal-confirm")
+const closeModal = document.querySelector(".close-modal")
+const changeLevelBtn = document.getElementById("change-level-btn")
+const logoutBtn = document.getElementById("logout-btn")
+
+// Display Elements
+const displayName = document.getElementById("display-name")
+const displayEmail = document.getElementById("display-email")
+const displayLevel = document.getElementById("display-level")
+const displayPassportId = document.getElementById("display-passport-id")
+const displayLastUpdated = document.getElementById("display-last-updated")
+const progressText = document.getElementById("progress-text")
+const progressBar = document.getElementById("progress-bar")
+
+// Templates
+const milestonePageTemplateRookie = document.getElementById("milestone-page-template-rookie")
+const milestonePageTemplateExperienced = document.getElementById("milestone-page-template-experienced")
+const milestoneItemTemplateRookie = document.getElementById("milestone-item-template-rookie")
+const milestoneItemTemplateExperienced = document.getElementById("milestone-item-template-experienced")
+
+// Current user data
+const currentUser = null
+
+// Remove the ES6 import statement
+// Replace this line:
+// import $ from "jquery"
+// The jQuery variable is already available from the CDN
+const $ = window.jQuery
+
 // User data
-let userData = {
+const userData = {
   name: "",
   email: "",
   level: "rookie",
@@ -35,647 +84,510 @@ let userData = {
   passportId: generatePassportId(),
 }
 
+// Milestone positions for interactive stamps
+const milestonePositions = {
+  // Advisor A (Rookie) - Page 1
+  a1: { left: 85, top: 220, type: "teal" }, // POWERBOOST
+  a2: { left: 85, top: 420, type: "teal" }, // START
+  a3: { left: 85, top: 620, type: "teal" }, // 4PILLARS
+
+  // Advisor A (Rookie) - Page 2
+  a4: { left: 85, top: 220, type: "teal" }, // JFW
+  a5: { left: 85, top: 420, type: "teal" }, // 90K VALIDATION
+  a6: { left: 85, top: 620, type: "teal" }, // PRODUCTS MASTERCLASS
+
+  // Advisor B - Page 1
+  b1: { left: 85, top: 220, type: "gold" }, // VUL ADVANCE
+  b2: { left: 85, top: 420, type: "gold" }, // POWERBOOST/APEX
+  b3: { left: 85, top: 620, type: "gold" }, // UW ESSENTIALS
+
+  // Advisor B - Page 2
+  b4: { left: 85, top: 220, type: "gold" }, // SUNNY LEVEL UP
+  b5: { left: 85, top: 420, type: "gold" }, // 1ST MEDALLION
+  b6: { left: 85, top: 620, type: "gold" }, // 180K VALIDATION
+}
+
+// Track current display mode
+const currentDisplayMode = window.innerWidth < 768 ? "single" : "double"
+
+function generatePassportId() {
+  const randomId = Math.random().toString(36).substring(2, 10).toUpperCase()
+  return `SL-${randomId}`
+}
+
 // Initialize the application when the DOM is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
-  // DOM Elements
-  const authContainer = document.getElementById("auth-container")
-  const loadingContainer = document.getElementById("loading-container")
-  const passportContainer = document.getElementById("passport-container")
-  const passportControls = document.getElementById("passport-controls")
-  const passportBook = document.getElementById("passport-book")
-  const accessPassportBtn = document.getElementById("access-passport-btn")
-  const advisorEmail = document.getElementById("advisor-email")
-  const advisorName = document.getElementById("advisor-name")
-  const authMessage = document.getElementById("auth-message")
-  const prevBtn = document.getElementById("prev-btn")
-  const nextBtn = document.getElementById("next-btn")
-  const shareBtn = document.getElementById("share-btn")
-  const printBtn = document.getElementById("print-btn")
-  const currentPage = document.getElementById("current-page")
-  const totalPages = document.getElementById("total-pages")
-  const notification = document.getElementById("notification")
-  const notificationMessage = document.getElementById("notification-message")
-  const notificationClose = document.getElementById("notification-close")
-  const shareModal = document.getElementById("share-modal")
-  const closeShareModal = document.getElementById("close-share-modal")
-  const copyLinkBtn = document.getElementById("copy-link-btn")
-  const shareLink = document.getElementById("share-link")
-  const emailShareBtn = document.getElementById("email-share-btn")
-  const whatsappShareBtn = document.getElementById("whatsapp-share-btn")
-  const sharedPassportModal = document.getElementById("shared-passport-modal")
-  const closeSharedModal = document.getElementById("close-shared-modal")
-  const keepMyDataBtn = document.getElementById("keep-my-data-btn")
-  const viewSharedBtn = document.getElementById("view-shared-btn")
+  // Preload all images to prevent loading issues
+  const imagesToPreload = [
+    "public/hard-cover-front.jpg",
+    "public/hard-cover-back.jpg",
+    "public/hard-inside-cover-wave-bg.jpg",
+    "public/page-content-wave-bg.jpg",
+    "public/milestones-pages-1.jpg",
+    "public/milestones-pages-2.jpg",
+    "public/milestones-pages-3.jpg",
+    "public/milestones-pages-4.jpg",
+    "public/sun-life-logo.png",
+  ]
 
-  // Milestone positions for interactive stamps
-  const milestonePositions = {
-    // Advisor A (Rookie) - Page 1
-    a1: { left: 85, top: 220, type: "teal" }, // POWERBOOST
-    a2: { left: 85, top: 420, type: "teal" }, // START
-    a3: { left: 85, top: 620, type: "teal" }, // 4PILLARS
+  let loadedImages = 0
+  const totalImages = imagesToPreload.length
 
-    // Advisor A (Rookie) - Page 2
-    a4: { left: 85, top: 220, type: "teal" }, // JFW
-    a5: { left: 85, top: 420, type: "teal" }, // 90K VALIDATION
-    a6: { left: 85, top: 620, type: "teal" }, // PRODUCTS MASTERCLASS
+  // // Show loading indicator
+  // const loadingIndicator = document.createElement("div")
+  // loadingIndicator.className = "loading-indicator"
+  // loadingIndicator.innerHTML = '<div class="spinner"></div><p>Loading passport...</p>'
+  // document.body.appendChild(loadingIndicator)
 
-    // Advisor B - Page 1
-    b1: { left: 85, top: 220, type: "gold" }, // VUL ADVANCE
-    b2: { left: 85, top: 420, type: "gold" }, // POWERBOOST/APEX
-    b3: { left: 85, top: 620, type: "gold" }, // UW ESSENTIALS
-
-    // Advisor B - Page 2
-    b4: { left: 85, top: 220, type: "gold" }, // SUNNY LEVEL UP
-    b5: { left: 85, top: 420, type: "gold" }, // 1ST MEDALLION
-    b6: { left: 85, top: 620, type: "gold" }, // 180K VALIDATION
-  }
-
-  // Track current display mode
-  let currentDisplayMode = window.innerWidth < 768 ? "single" : "double"
-
-  // Initialize the application
-  init()
-
-  function init() {
-    // Check URL for shared passport
-    checkForSharedPassport()
-
-    // Add event listeners
-    setupEventListeners()
-  }
-
-  function setupEventListeners() {
-    // Access passport button
-    if (accessPassportBtn) {
-      accessPassportBtn.addEventListener("click", handleAccessPassport)
-    }
-
-    // Navigation buttons
-    if (prevBtn) {
-      prevBtn.addEventListener("click", () => {
-        $(passportBook).turn("previous")
-      })
-    }
-
-    if (nextBtn) {
-      nextBtn.addEventListener("click", () => {
-        $(passportBook).turn("next")
-      })
-    }
-
-    // Share button
-    if (shareBtn) {
-      shareBtn.addEventListener("click", handleShare)
-    }
-
-    // Print button
-    if (printBtn) {
-      printBtn.addEventListener("click", handlePrint)
-    }
-
-    // Notification close button
-    if (notificationClose) {
-      notificationClose.addEventListener("click", hideNotification)
-    }
-
-    // Share modal close button
-    if (closeShareModal) {
-      closeShareModal.addEventListener("click", () => {
-        shareModal.classList.add("hidden")
-      })
-    }
-
-    // Copy link button
-    if (copyLinkBtn) {
-      copyLinkBtn.addEventListener("click", () => {
-        shareLink.select()
-        document.execCommand("copy")
-        showNotification("Link copied to clipboard!")
-      })
-    }
-
-    // Email share button
-    if (emailShareBtn) {
-      emailShareBtn.addEventListener("click", () => {
-        const subject = encodeURIComponent("My Sun Life Training Journey Passport")
-        const body = encodeURIComponent(`Check out my Sun Life Training Journey Passport: ${shareLink.value}`)
-        window.open(`mailto:?subject=${subject}&body=${body}`)
-      })
-    }
-
-    // WhatsApp share button
-    if (whatsappShareBtn) {
-      whatsappShareBtn.addEventListener("click", () => {
-        const text = encodeURIComponent(`Check out my Sun Life Training Journey Passport: ${shareLink.value}`)
-        window.open(`https://wa.me/?text=${text}`)
-      })
-    }
-
-    // Shared passport modal buttons
-    if (closeSharedModal) {
-      closeSharedModal.addEventListener("click", () => {
-        sharedPassportModal.classList.add("hidden")
-      })
-    }
-
-    if (keepMyDataBtn) {
-      keepMyDataBtn.addEventListener("click", () => {
-        sharedPassportModal.classList.add("hidden")
-      })
-    }
-
-    if (viewSharedBtn) {
-      viewSharedBtn.addEventListener("click", () => {
-        // Clear local storage and reload with the shared parameter
-        localStorage.removeItem("sunLifePassportUser")
-        sharedPassportModal.classList.add("hidden")
-        location.reload()
-      })
-    }
-
-    // Add logout button event listener
-    document.addEventListener("click", (e) => {
-      if (e.target && e.target.id === "logout-btn") {
-        handleLogout()
+  // Preload images
+  imagesToPreload.forEach((src) => {
+    const img = new Image()
+    img.onload = () => {
+      loadedImages++
+      if (loadedImages === totalImages) {
+        initializePassport()
+        loadingIndicator.remove()
       }
+    }
+    img.onerror = () => {
+      console.error("Failed to load image:", src)
+      loadedImages++
+      if (loadedImages === totalImages) {
+        initializePassport()
+        loadingIndicator.remove()
+      }
+    }
+    img.src = src
+  })
+
+  function initializePassport() {
+    // Check if this is a shared passport
+    const urlParams = new URLSearchParams(window.location.search)
+    const isShared = urlParams.get("shared")
+
+    // Check if there's existing passport data in localStorage
+    const existingData = localStorage.getItem("passportData")
+
+    if (isShared && existingData) {
+      // Ask user if they want to view the shared passport
+      showConfirmDialog(
+        "You already have passport data saved. Would you like to temporarily view the shared passport?",
+        () => {
+          // User chose to view shared passport
+          initializeFlipbook()
+        },
+      )
+    } else {
+      initializeFlipbook()
+    }
+  }
+
+  function showConfirmDialog(message, onConfirm) {
+    const dialog = document.createElement("div")
+    dialog.className = "confirm-dialog"
+    dialog.innerHTML = `
+      <div class="confirm-dialog-content">
+        <p>${message}</p>
+        <div class="confirm-dialog-buttons">
+          <button class="btn-cancel">Cancel</button>
+          <button class="btn-confirm">Confirm</button>
+        </div>
+      </div>
+    `
+
+    document.body.appendChild(dialog)
+
+    dialog.querySelector(".btn-confirm").addEventListener("click", () => {
+      dialog.remove()
+      onConfirm()
+    })
+
+    dialog.querySelector(".btn-cancel").addEventListener("click", () => {
+      dialog.remove()
     })
   }
 
-  function handleLogout() {
-    // Clear user data
-    localStorage.removeItem("sunLifePassportUser")
-
-    // Show notification
-    showNotification("Logged out successfully!")
-
-    // Redirect to login page after a short delay
-    setTimeout(() => {
-      location.reload()
-    }, 1500)
-  }
-
-  // Update the handleAccessPassport function to use a default level
-  function handleAccessPassport() {
-    const email = advisorEmail.value.trim()
-    const name = advisorName.value.trim()
-    const level = "rookie" // Default to rookie since we removed the dropdown
-
-    if (!email || !name) {
-      showAuthError("Please fill in all fields.")
-      return
-    }
-
-    if (!isValidEmail(email)) {
-      showAuthError("Please enter a valid email address.")
-      return
-    }
-
-    showLoading()
-
-    // Simulate API call
-    setTimeout(() => {
-      userData = {
-        name,
-        email,
-        level,
-        completedMilestones: [],
-        lastUpdated: new Date().toISOString(),
-        passportId: generatePassportId(),
-      }
-
-      // Save user data
-      saveUserData()
-
-      // Load passport
-      loadPassport()
-    }, 1000)
-  }
-
-  function loadPassport() {
+  function initializeFlipbook() {
     // Create passport pages
-    createPassportPages()
+    const passport = document.getElementById("passport")
 
-    // Hide auth and loading, show passport
-    authContainer.classList.add("hidden")
-    loadingContainer.classList.add("hidden")
-    passportContainer.classList.remove("hidden")
-    passportControls.classList.remove("hidden")
+    // Front cover
+    const frontCover = createPage("hard-cover-front.jpg", "front-cover")
+    passport.appendChild(frontCover)
+
+    // Inside front cover
+    const insideFrontCover = createPage("hard-inside-cover-wave-bg.jpg", "inside-front-cover")
+    const logoContainer = document.createElement("div")
+    logoContainer.className = "logo-container"
+    logoContainer.innerHTML = `<img src="public/sun-life-logo.png" alt="Sun Life Logo" class="sun-life-logo">`
+    insideFrontCover.appendChild(logoContainer)
+    passport.appendChild(insideFrontCover)
+
+    // Personal Information page
+    const personalInfoPage = createPage("page-content-wave-bg.jpg", "personal-info-page")
+    const personalInfoContent = document.createElement("div")
+    personalInfoContent.className = "page-content"
+    personalInfoContent.innerHTML = `
+      <h2>PERSONAL INFORMATION</h2>
+      <div class="personal-info-form">
+        <div class="form-group">
+          <label for="name">Name:</label>
+          <input type="text" id="name" placeholder="Enter your name">
+        </div>
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" id="email" placeholder="Enter your email">
+        </div>
+        <div class="form-group">
+          <label for="passport-id">Passport ID:</label>
+          <input type="text" id="passport-id" value="SL-${Math.random().toString(36).substring(2, 10).toUpperCase()}" readonly>
+        </div>
+        <div class="form-group">
+          <label for="issue-date">Issue Date:</label>
+          <input type="text" id="issue-date" value="${new Date().toLocaleDateString()}" readonly>
+        </div>
+        <button class="save-info-btn">Save Information</button>
+        <button class="logout-btn">Logout</button>
+      </div>
+    `
+    personalInfoPage.appendChild(personalInfoContent)
+    passport.appendChild(personalInfoPage)
+
+    // Your Progress page
+    const progressPage = createPage("page-content-wave-bg.jpg", "progress-page")
+    const progressContent = document.createElement("div")
+    progressContent.className = "page-content"
+    progressContent.innerHTML = `
+      <h2>YOUR PROGRESS</h2>
+      <div class="progress-container">
+        <div class="progress-bar-container">
+          <div class="progress-label">Overall Completion</div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 35%;"></div>
+          </div>
+          <div class="progress-percentage">35%</div>
+        </div>
+        
+        <div class="progress-stats">
+          <div class="stat-item">
+            <div class="stat-value">7</div>
+            <div class="stat-label">Milestones Completed</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">13</div>
+            <div class="stat-label">Milestones Remaining</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">3</div>
+            <div class="stat-label">Badges Earned</div>
+          </div>
+        </div>
+        
+        <div class="recent-activity">
+          <h3>Recent Activity</h3>
+          <ul>
+            <li>Completed "Financial Planning 101" - 2 days ago</li>
+            <li>Earned "Early Starter" badge - 1 week ago</li>
+            <li>Completed "Retirement Basics" - 2 weeks ago</li>
+          </ul>
+        </div>
+      </div>
+    `
+    progressPage.appendChild(progressContent)
+    passport.appendChild(progressPage)
+
+    // Milestone pages
+    // Page 1
+    const milestonePage1 = createPage("milestones-pages-1.jpg", "milestone-page")
+    const milestoneContent1 = createMilestoneContent([
+      { title: "Financial Planning 101", completed: true },
+      { title: "Budget Creation", completed: true },
+      { title: "Emergency Fund Setup", completed: false },
+    ])
+    milestonePage1.appendChild(milestoneContent1)
+    passport.appendChild(milestonePage1)
+
+    // Page 2
+    const milestonePage2 = createPage("milestones-pages-2.jpg", "milestone-page")
+    const milestoneContent2 = createMilestoneContent([
+      { title: "Retirement Planning", completed: true },
+      { title: "Investment Basics", completed: true },
+      { title: "Tax Optimization", completed: false },
+    ])
+    milestonePage2.appendChild(milestoneContent2)
+    passport.appendChild(milestonePage2)
+
+    // Page 3
+    const milestonePage3 = createPage("milestones-pages-3.jpg", "milestone-page")
+    const milestoneContent3 = createMilestoneContent([
+      { title: "Insurance Coverage", completed: true },
+      { title: "Estate Planning", completed: false },
+      { title: "Debt Management", completed: true },
+    ])
+    milestonePage3.appendChild(milestoneContent3)
+    passport.appendChild(milestonePage3)
+
+    // Page 4
+    const milestonePage4 = createPage("milestones-pages-4.jpg", "milestone-page")
+    const milestoneContent4 = createMilestoneContent([
+      { title: "College Savings", completed: false },
+      { title: "Home Buying", completed: true },
+      { title: "Financial Independence", completed: false },
+    ])
+    milestonePage4.appendChild(milestoneContent4)
+    passport.appendChild(milestonePage4)
+
+    // Back inside cover
+    const insideBackCover = createPage("hard-inside-cover-wave-bg.jpg", "inside-back-cover")
+    passport.appendChild(insideBackCover)
+
+    // Back cover
+    const backCover = createPage("hard-cover-back.jpg", "back-cover")
+    passport.appendChild(backCover)
 
     // Initialize turn.js
-    initTurnJs()
+    initializeTurnJS()
 
-    // Update user information display
-    updateUserInfoDisplay()
-
-    // Update progress display
-    updateProgressDisplay()
-  }
-
-  function updateUserInfoDisplay() {
-    // Update personal information page
-    const displayName = document.getElementById("display-name")
-    const displayEmail = document.getElementById("display-email")
-    const displayPassportId = document.getElementById("display-passport-id")
-    const displayLastUpdated = document.getElementById("display-last-updated")
-
-    if (displayName) displayName.textContent = userData.name
-    if (displayEmail) displayEmail.textContent = userData.email
-    if (displayPassportId) displayPassportId.textContent = userData.passportId
-    if (displayLastUpdated) {
-      const date = new Date(userData.lastUpdated)
-      displayLastUpdated.textContent = date.toLocaleDateString() + " " + date.toLocaleTimeString()
-    }
-  }
-
-  function updateProgressDisplay() {
-    // Update progress bar and text
-    const progressBar = document.getElementById("progress-bar")
-    const progressText = document.getElementById("progress-text")
-
-    if (progressBar && progressText) {
-      const totalMilestones = 12 // Total number of milestones
-      const completedCount = userData.completedMilestones.length
-      const progressPercentage = (completedCount / totalMilestones) * 100
-
-      progressBar.style.width = progressPercentage + "%"
-      progressText.textContent = `${completedCount} of ${totalMilestones} milestones completed`
-    }
-  }
-
-  function createPassportPages() {
-    // Clear existing pages
-    passportBook.innerHTML = ""
-
-    // Create front cover
-    const frontCover = document.createElement("div")
-    frontCover.className = "hard"
-    frontCover.style.backgroundImage = "url('public/hard-cover-front.jpg')"
-    frontCover.style.backgroundSize = "cover"
-    frontCover.style.backgroundPosition = "center"
-    passportBook.appendChild(frontCover)
-
-    // Create inside cover with logo
-    const insideCover = document.createElement("div")
-    insideCover.className = "hard inside-cover wave-bg"
-    insideCover.innerHTML = `
-      <div class="binding-effect right"></div>
-    `
-    passportBook.appendChild(insideCover)
-
-    // Create title page
-    const titlePage = document.createElement("div")
-    titlePage.innerHTML = `
-      <div class="page-content wave-bg">
-        <div class="binding-effect left"></div>
-        <div class="inside-page-content">
-          <div class="sun-logo">
-            <img src="public/sun-life-logo.png" alt="Sun Life Logo" class="sun-life-logo-img">
-          </div>
-          <h2 class="sunlife-title lekton">Sun Life</h2>
-          <h3 class="training-journey playfair">TRAINING JOURNEY</h3>
-        </div>
-      </div>
-    `
-    passportBook.appendChild(titlePage)
-
-    // Create progress page
-    const progressPage = document.createElement("div")
-    progressPage.innerHTML = `
-      <div class="page-content wave-bg">
-        <div class="binding-effect right"></div>
-        <h2 class="page-title">YOUR PROGRESS</h2>
-        
-        <div class="progress-section">
-          <div class="progress-info">
-            <span id="progress-text">0 of 12 milestones completed</span>
-          </div>
-          <div class="progress-bar-container">
-            <div id="progress-bar" class="progress-bar"></div>
-          </div>
-        </div>
-        
-        <div class="data-info">
-          <h3>Important Information</h3>
-          <p>Your progress is automatically saved to your browser and will be available when you return.</p>
-          <p>All personal information is stored locally and is not shared with any third parties.</p>
-          <p>Your data will be automatically removed after 6 months of inactivity.</p>
-          <p>This passport tracks your progress through all 12 milestones across both Advisor A and Advisor B levels.</p>
-          <p>You can share your progress with others using the Share button below.</p>
-        </div>
-      </div>
-    `
-    passportBook.appendChild(progressPage)
-
-    // Create personal info page
-    const personalInfoPage = document.createElement("div")
-    personalInfoPage.innerHTML = `
-      <div class="page-content wave-bg">
-        <div class="binding-effect left"></div>
-        <h2 class="page-title">PERSONAL INFORMATION</h2>
-        
-        <div class="info-section">
-          <div class="info-row">
-            <label>Name:</label>
-            <span id="display-name"></span>
-          </div>
-          
-          <div class="info-row">
-            <label>Email:</label>
-            <span id="display-email"></span>
-          </div>
-          
-          <div class="info-row">
-            <label>Passport ID:</label>
-            <span id="display-passport-id"></span>
-          </div>
-          
-          <div class="info-row">
-            <label>Last Updated:</label>
-            <span id="display-last-updated"></span>
-          </div>
-        </div>
-        
-        <div class="actions-section">
-          <button id="logout-btn" class="btn outline-btn">Logout</button>
-        </div>
-      </div>
-    `
-    passportBook.appendChild(personalInfoPage)
-
-    // Define milestone pages with optimized JPG format
-    const milestonePages = [
-      { src: "public/milestones-pages-1.jpg", milestones: ["a1", "a2", "a3"] },
-      { src: "public/milestones-pages-2.jpg", milestones: ["a4", "a5", "a6"] },
-      { src: "public/milestones-pages-3.jpg", milestones: ["b1", "b2", "b3"] },
-      { src: "public/milestones-pages-4.jpg", milestones: ["b4", "b5", "b6"] },
-    ]
-
-    // Create milestone pages
-    milestonePages.forEach((page) => {
-      const pageElement = document.createElement("div")
-      pageElement.style.backgroundImage = `url(${page.src})`
-      pageElement.style.backgroundSize = "cover"
-      pageElement.style.backgroundPosition = "center"
-
-      // Add milestone stamps
-      if (page.milestones) {
-        page.milestones.forEach((milestoneId) => {
-          const position = milestonePositions[milestoneId]
-          if (position) {
-            const stampOverlay = document.createElement("div")
-            stampOverlay.className = `stamp-overlay ${position.type}`
-            stampOverlay.dataset.milestoneId = milestoneId
-
-            // Position the stamp
-            stampOverlay.style.position = "absolute"
-            stampOverlay.style.left = `${position.left}px`
-            stampOverlay.style.top = `${position.top}px`
-
-            // Check if milestone is completed
-            if (userData.completedMilestones.includes(milestoneId)) {
-              stampOverlay.classList.add("completed")
-            }
-
-            // Add click event
-            stampOverlay.addEventListener("click", () => {
-              toggleMilestone(milestoneId)
-            })
-
-            pageElement.appendChild(stampOverlay)
-          }
-        })
-      }
-
-      passportBook.appendChild(pageElement)
+    // Add event listeners for buttons
+    document.querySelector(".save-info-btn")?.addEventListener("click", () => {
+      alert("Information saved successfully!")
     })
 
-    // Create back cover
-    const backCover = document.createElement("div")
-    backCover.className = "hard"
-    backCover.style.backgroundImage = "url('public/hard-cover-back.jpg')"
-    backCover.style.backgroundSize = "cover"
-    backCover.style.backgroundPosition = "center"
-    passportBook.appendChild(backCover)
+    document.querySelector(".logout-btn")?.addEventListener("click", () => {
+      if (confirm("Are you sure you want to logout?")) {
+        alert("Logged out successfully!")
+      }
+    })
+
+    // Add print functionality
+    document.getElementById("print-btn")?.addEventListener("click", printPassport)
+
+    // Add responsive handling
+    handleResponsiveLayout()
+    window.addEventListener("resize", handleResponsiveLayout)
   }
 
-  function initTurnJs() {
-    // Get window width to determine display mode
-    const windowWidth = window.innerWidth
-    const isMobile = windowWidth < 768
-    currentDisplayMode = isMobile ? "single" : "double"
+  function createPage(backgroundImage, className) {
+    const page = document.createElement("div")
+    page.className = `page ${className}`
+    page.style.backgroundImage = `url('public/${backgroundImage}')`
+    page.style.backgroundSize = "cover"
+    page.style.backgroundPosition = "center"
+    return page
+  }
 
-    // Initialize turn.js with fixed options
-    $(passportBook).turn({
-      width: passportContainer.offsetWidth,
-      height: passportContainer.offsetWidth * 0.7071, // Maintain aspect ratio
+  function createMilestoneContent(milestones) {
+    const content = document.createElement("div")
+    content.className = "milestone-content"
+
+    const list = document.createElement("div")
+    list.className = "milestone-list"
+
+    milestones.forEach((milestone) => {
+      const item = document.createElement("div")
+      item.className = "milestone-item"
+
+      const checkbox = document.createElement("div")
+      checkbox.className = `milestone-checkbox ${milestone.completed ? "completed" : ""}`
+      if (milestone.completed) {
+        const stamp = document.createElement("div")
+        stamp.className = "stamp"
+        stamp.innerHTML = `<img src="public/certified-${Math.random() > 0.5 ? "gold" : "teal"}.png" alt="Certified Stamp">`
+        checkbox.appendChild(stamp)
+      }
+
+      const title = document.createElement("div")
+      title.className = "milestone-title"
+      title.textContent = milestone.title
+
+      item.appendChild(checkbox)
+      item.appendChild(title)
+      list.appendChild(item)
+    })
+
+    content.appendChild(list)
+    return content
+  }
+
+  function initializeTurnJS() {
+    $("#passport").turn({
+      width: calculatePassportWidth(),
+      height: calculatePassportHeight(),
       autoCenter: true,
-      display: currentDisplayMode,
-      acceleration: true,
       gradients: true,
-      elevation: 50,
+      acceleration: true,
+      elevation: 50, // Increase elevation for more pronounced shadow
+      duration: 1000,
       when: {
-        turning: (event, page, pageObject) => {
-          currentPage.textContent = page
+        turning: (e, page, view) => {
+          // Add shadow effect to the center
+          enhanceCenterShadow(page)
         },
-        turned: function (event, page, pageObject) {
-          currentPage.textContent = page
-          totalPages.textContent = $(this).turn("pages")
+        turned: (e, page, view) => {
+          // Refresh shadow effect after page turn
+          enhanceCenterShadow(page)
         },
       },
     })
 
-    // Make responsive
-    window.addEventListener(
-      "resize",
-      debounce(() => {
-        const newWindowWidth = window.innerWidth
-        const newIsMobile = newWindowWidth < 768
-        const newDisplayMode = newIsMobile ? "single" : "double"
+    // Add navigation controls
+    document.getElementById("prev-btn").addEventListener("click", () => {
+      $("#passport").turn("previous")
+    })
 
-        // Resize the book
-        $(passportBook).turn("size", passportContainer.offsetWidth, passportContainer.offsetWidth * 0.7071)
-
-        // Only update display mode if it changed
-        if (newDisplayMode !== currentDisplayMode) {
-          // We need to recreate the book with the new display mode
-          // First, save the current page
-          const currentPageNum = $(passportBook).turn("page") || 1
-
-          // Remove the turn.js functionality
-          $(passportBook).turn("disable", true).unbind()
-
-          // Empty the book
-          passportBook.innerHTML = ""
-
-          // Recreate pages
-          createPassportPages()
-
-          // Reinitialize with new display mode
-          $(passportBook).turn({
-            width: passportContainer.offsetWidth,
-            height: passportContainer.offsetWidth * 0.7071,
-            autoCenter: true,
-            display: newDisplayMode,
-            acceleration: true,
-            gradients: true,
-            elevation: 50,
-            page: currentPageNum,
-            when: {
-              turning: (event, page, pageObject) => {
-                currentPage.textContent = page
-              },
-              turned: function (event, page, pageObject) {
-                currentPage.textContent = page
-                totalPages.textContent = $(this).turn("pages")
-              },
-            },
-          })
-
-          // Update current display mode
-          currentDisplayMode = newDisplayMode
-
-          // Update user information and progress display
-          updateUserInfoDisplay()
-          updateProgressDisplay()
-        }
-      }, 200),
-    )
+    document.getElementById("next-btn").addEventListener("click", () => {
+      $("#passport").turn("next")
+    })
   }
 
-  function toggleMilestone(milestoneId) {
-    const index = userData.completedMilestones.indexOf(milestoneId)
-    const stampElements = document.querySelectorAll(`.stamp-overlay[data-milestone-id="${milestoneId}"]`)
+  function enhanceCenterShadow(page) {
+    // Add shadow effect to the center of the book
+    const pages = document.querySelectorAll(".page")
+    pages.forEach((p) => {
+      // Reset all shadows
+      p.style.boxShadow = ""
+    })
 
-    if (index === -1) {
-      // Complete milestone
-      userData.completedMilestones.push(milestoneId)
-      stampElements.forEach((stamp) => stamp.classList.add("completed"))
-      showNotification("Milestone completed!")
-    } else {
-      // Uncomplete milestone
-      userData.completedMilestones.splice(index, 1)
-      stampElements.forEach((stamp) => stamp.classList.remove("completed"))
-      showNotification("Milestone marked as incomplete.")
-    }
+    // Add shadow to current visible pages
+    if (page > 1 && page < pages.length) {
+      const leftPage = pages[page - 2]
+      const rightPage = pages[page - 1]
 
-    // Update last updated timestamp
-    userData.lastUpdated = new Date().toISOString()
-
-    // Save user data
-    saveUserData()
-
-    // Update progress display
-    updateProgressDisplay()
-  }
-
-  function handleShare() {
-    // Generate shareable link
-    const shareData = {
-      name: userData.name,
-      email: userData.email,
-      completedMilestones: userData.completedMilestones,
-      lastUpdated: userData.lastUpdated,
-      passportId: userData.passportId,
-    }
-
-    const encodedData = btoa(JSON.stringify(shareData))
-    const shareableLink = `${window.location.href.split("?")[0]}?shared=${encodedData}`
-
-    // Set link in input field
-    shareLink.value = shareableLink
-
-    // Show share modal
-    shareModal.classList.remove("hidden")
-  }
-
-  function handlePrint() {
-    // Show notification
-    showNotification("Preparing for print...")
-
-    // Use browser's print functionality
-    window.print()
-  }
-
-  function checkForSharedPassport() {
-    const urlParams = new URLSearchParams(window.location.search)
-    const sharedData = urlParams.get("shared")
-
-    if (sharedData) {
-      try {
-        // Check if user already has data
-        const existingData = localStorage.getItem("sunLifePassportUser")
-
-        if (existingData) {
-          // Show modal asking what to do
-          sharedPassportModal.classList.remove("hidden")
-        } else {
-          // No existing data, load shared passport
-          const decodedData = JSON.parse(atob(sharedData))
-          userData = decodedData
-          loadPassport()
-        }
-      } catch (error) {
-        console.error("Error parsing shared data:", error)
-        showNotification("Invalid shared passport link.")
+      if (leftPage) {
+        leftPage.style.boxShadow = "inset -10px 0 20px rgba(0,0,0,0.4)"
       }
-    } else {
-      // Check if user is already logged in
-      const savedData = localStorage.getItem("sunLifePassportUser")
-      if (savedData) {
-        try {
-          userData = JSON.parse(savedData)
-          loadPassport()
-        } catch (error) {
-          console.error("Error parsing saved data:", error)
-        }
+
+      if (rightPage) {
+        rightPage.style.boxShadow = "inset 10px 0 20px rgba(0,0,0,0.4)"
       }
     }
   }
 
-  function saveUserData() {
-    localStorage.setItem("sunLifePassportUser", JSON.stringify(userData))
-  }
+  function calculatePassportWidth() {
+    const windowWidth = window.innerWidth
+    const isMobile = windowWidth < 768
 
-  function showLoading() {
-    authContainer.classList.add("hidden")
-    loadingContainer.classList.remove("hidden")
-  }
-
-  function showAuthError(message) {
-    authMessage.textContent = message
-    authMessage.className = "message error"
-  }
-
-  function showNotification(message) {
-    notificationMessage.textContent = message
-    notification.classList.remove("hidden")
-
-    // Auto hide after 3 seconds
-    setTimeout(hideNotification, 3000)
-  }
-
-  function hideNotification() {
-    notification.classList.add("hidden")
-  }
-
-  function isValidEmail(email) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return re.test(email)
-  }
-
-  function debounce(func, wait) {
-    let timeout
-    return function () {
-      const args = arguments
-      clearTimeout(timeout)
-      timeout = setTimeout(() => {
-        func.apply(this, args)
-      }, wait)
+    if (isMobile) {
+      // On mobile, use single page view
+      return Math.min(windowWidth * 0.9, 400)
+    } else {
+      // On desktop, use double page view
+      return Math.min(windowWidth * 0.8, 1000)
     }
+  }
+
+  function calculatePassportHeight() {
+    const windowHeight = window.innerHeight
+    const headerHeight = document.querySelector(".header")?.offsetHeight || 0
+    const controlsHeight = document.querySelector(".controls")?.offsetHeight || 0
+    const availableHeight = windowHeight - headerHeight - controlsHeight - 40 // 40px for margins
+
+    return Math.min(availableHeight, 600)
+  }
+
+  function handleResponsiveLayout() {
+    const windowWidth = window.innerWidth
+    const isMobile = windowWidth < 768
+
+    // Resize the passport
+    $("#passport").turn("size", calculatePassportWidth(), calculatePassportHeight())
+
+    // Update display mode for mobile
+    if (isMobile) {
+      $("#passport").turn("display", "single")
+      $("#passport").turn("options", { display: "single" })
+    } else {
+      $("#passport").turn("display", "double")
+      $("#passport").turn("options", { display: "double" })
+    }
+
+    // Center the passport
+    $("#passport").turn("center")
+
+    // Refresh shadow effect
+    const currentPage = $("#passport").turn("page")
+    enhanceCenterShadow(currentPage)
+  }
+
+  function printPassport() {
+    // Create a new window for printing
+    const printWindow = window.open("", "_blank")
+
+    // Get all pages
+    const pages = document.querySelectorAll(".page")
+
+    // Create HTML content for printing
+    let printContent = `
+      <html>
+      <head>
+        <title>Passport Print</title>
+        <style>
+          body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
+          .print-page { page-break-after: always; margin-bottom: 20px; }
+          .print-page img { width: 100%; height: auto; border: 1px solid #ccc; }
+          h2 { text-align: center; margin-bottom: 10px; }
+          .milestone-item { margin: 10px 0; padding: 5px; border-bottom: 1px solid #eee; }
+          .completed:before { content: "✓"; color: green; margin-right: 5px; }
+        </style>
+      </head>
+      <body>
+        <h1 style="text-align: center;">Sun Life Financial Passport</h1>
+    `
+
+    // Add each page to the print content
+    pages.forEach((page, index) => {
+      // Create a canvas to render the page
+      const canvas = document.createElement("canvas")
+      const ctx = canvas.getContext("2d")
+      const width = 800
+      const height = 600
+
+      canvas.width = width
+      canvas.height = height
+
+      // Draw background
+      ctx.fillStyle = "#fff"
+      ctx.fillRect(0, 0, width, height)
+
+      // Get background image
+      const bgImage = page.style.backgroundImage
+      if (bgImage && bgImage !== "none") {
+        const imgUrl = bgImage.replace(/url$$['"](.+)['"]$$/, "$1")
+        const img = new Image()
+        img.crossOrigin = "anonymous" // Prevent CORS issues
+        img.src = imgUrl
+
+        // Draw the background image
+        ctx.drawImage(img, 0, 0, width, height)
+      }
+
+      // Add page content
+      const content = page.innerHTML
+
+      printContent += `
+        <div class="print-page">
+          <h2>Page ${index + 1}</h2>
+          <img src="${canvas.toDataURL("image/png")}" alt="Page ${index + 1}">
+          <div class="page-content-print">
+            ${content}
+          </div>
+        </div>
+      `
+    })
+
+    printContent += `
+      </body>
+      </html>
+    `
+
+    // Write content to the new window
+    printWindow.document.open()
+    printWindow.document.write(printContent)
+    printWindow.document.close()
+
+    // Print after images have loaded
+    setTimeout(() => {
+      printWindow.print()
+    }, 1000)
   }
 })
-
-// Generate a unique passport ID
-function generatePassportId() {
-  return "SL-" + Math.random().toString(36).substring(2, 8).toUpperCase()
-}
