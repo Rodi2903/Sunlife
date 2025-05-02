@@ -7,9 +7,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Lekton:wght@400;700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="shortcut icon" href="public/sun-life-logo.png" type="image/x-icon">
-  <!-- Turn.js library -->
+  <!-- jQuery -->
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <!-- Turn.js library -->
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
+  <!-- html2pdf library for PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
   <div class="container">
@@ -33,14 +36,6 @@
           <input type="text" id="advisor-name" placeholder="Your Name" required>
         </div>
         
-        <div class="form-group" style="display: none;">
-          <label for="advisor-type">Advisor Level</label>
-          <select id="advisor-type">
-            <option value="rookie">Advisor A (Rookie)</option>
-            <option value="experienced">Advisor B (1.5-2 years)</option>
-          </select>
-        </div>
-        
         <button id="access-passport-btn" class="btn primary-btn">Access Passport</button>
         <p id="auth-message" class="message"></p>
       </div>
@@ -56,180 +51,19 @@
     <div id="passport-container" class="passport-container hidden">
       <!-- Passport Book -->
       <div id="passport-book" class="passport-book">
-  <!-- Cover -->
-  <div class="hard cover-front">
-    <div class="cover-content">
-      <h1 class="playfair">PASSPORT</h1>
-      <div class="sun-logo">
-        <img src="public/sun-life-logo.png" alt="Sun Life Logo" class="sun-life-logo-img">
+        <!-- Pages will be dynamically inserted here -->
       </div>
-      <div class="cover-bottom">
-        <h2 class="lekton">SUNLIFE</h2>
-        <h3 class="playfair">TRAINING JOURNEY</h3>
-      </div>
-    </div>
-  </div>
-
-  <!-- First Page - Blank left, Logo centered on right -->
-  <div class="hard inside-cover wave-bg">
-    <!-- Blank left page -->
-    <div class="binding-effect right"></div>
-  </div>
-  <div>
-    <div class="page-content wave-bg">
-      <div class="binding-effect left"></div>
-      <div class="inside-page-content">
-        <div class="sun-logo">
-          <img src="public/sun-life-logo.png" alt="Sun Life Logo" class="sun-life-logo-img">
-        </div>
-        <h2 class="sunlife-title lekton">Sun Life</h2>
-        <h3 class="training-journey playfair">TRAINING JOURNEY</h3>
-      </div>
-    </div>
-  </div>
-
-  <!-- Progress Page and Personal Info Page -->
-  <div>
-    <div class="page-content wave-bg">
-      <div class="binding-effect right"></div>
-      <h2 class="page-title">YOUR PROGRESS</h2>
-      
-      <div class="progress-section">
-        <div class="progress-info">
-          <span id="progress-text">0 of 12 milestones completed</span>
-        </div>
-        <div class="progress-bar-container">
-          <div id="progress-bar" class="progress-bar"></div>
-        </div>
-      </div>
-      
-      <div class="data-info">
-        <h3>Important Information</h3>
-        <p>Your progress is automatically saved to your browser and will be available when you return.</p>
-        <p>All personal information is stored locally and is not shared with any third parties.</p>
-        <p>Your data will be automatically removed after 6 months of inactivity.</p>
-        <p>This passport tracks your progress through all 12 milestones across both Advisor A and Advisor B levels.</p>
-        <p>You can share your progress with others using the Share button below.</p>
-      </div>
-    </div>
-  </div>
-  
-  <div>
-    <div class="page-content wave-bg">
-      <div class="binding-effect left"></div>
-      <h2 class="page-title">PERSONAL INFORMATION</h2>
-      
-      <div class="info-section">
-        <div class="info-row">
-          <label>Name:</label>
-          <span id="display-name"></span>
-        </div>
-        
-        <div class="info-row">
-          <label>Email:</label>
-          <span id="display-email"></span>
-        </div>
-        
-        <div class="info-row">
-          <label>Passport ID:</label>
-          <span id="display-passport-id"></span>
-        </div>
-        
-        <div class="info-row">
-          <label>Last Updated:</label>
-          <span id="display-last-updated"></span>
-        </div>
-      </div>
-      
-      <div class="actions-section">
-        <button id="logout-btn" class="btn outline-btn">Logout</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Milestones Pages (will be dynamically generated) -->
-  <div id="milestones-pages">
-    <!-- Milestones will be inserted here -->
-  </div>
-
-  <!-- Back Cover -->
-  <div class="hard cover-back">
-    <div class="cover-content back-cover">
-      <div class="sun-logo">
-        <img src="public/sun-life-logo.png" alt="Sun Life Logo" class="sun-life-logo-img">
-      </div>
-      <p class="back-title lekton">SUN LIFE TRAINING JOURNEY</p>
-    </div>
-  </div>
-</div>
     </div>
 
     <!-- Controls -->
-    <!-- Add sharing and download buttons to the passport controls -->
     <div id="passport-controls" class="passport-controls hidden">
       <button id="prev-btn" class="btn control-btn">Previous</button>
-      <span id="page-num">Page: <span id="current-page">1</span> / <span id="total-pages">6</span></span>
+      <span id="page-num">Page: <span id="current-page">1</span> / <span id="total-pages">8</span></span>
       <button id="next-btn" class="btn control-btn">Next</button>
       <button id="share-btn" class="btn share-btn">Share Passport</button>
-      <button id="print-btn" class="btn print-btn">Print</button>
+      <button id="print-btn" class="btn print-btn">Print/Export PDF</button>
     </div>
-
-  <!-- Templates -->
-  <template id="milestone-page-template-rookie">
-    <div>
-      <div class="page-content wave-bg milestone-page">
-        <div class="binding-effect left"></div>
-        <div class="advisor-header rookie">
-          <h2 class="advisor-title">ADVISOR A <span class="gold-text">(ROOKIE)</span></h2>
-          <div class="advisor-divider rookie-divider"></div>
-        </div>
-        <div class="milestones-grid">
-          <!-- Milestone items will be inserted here -->
-        </div>
-      </div>
-    </div>
-  </template>
-
-  <template id="milestone-page-template-experienced">
-    <div>
-      <div class="page-content wave-bg milestone-page">
-        <div class="binding-effect left"></div>
-        <div class="advisor-header experienced">
-          <h2 class="advisor-title">ADVISOR B <span class="gold-text">(1.5 YR - 2 YEARS)</span></h2>
-          <div class="advisor-divider experienced-divider"></div>
-        </div>
-        <div class="milestones-grid">
-          <!-- Milestone items will be inserted here -->
-        </div>
-      </div>
-    </div>
-  </template>
-
-  <template id="milestone-item-template-rookie">
-    <div class="milestone-item" data-id="">
-      <div class="milestone-stamp-container">
-        <img src="public/certified-teal.png" alt="Certified" class="certified-img rookie-stamp">
-      </div>
-      <div class="milestone-content">
-        <div class="milestone-number gold-text">MILESTONE <span class="milestone-num"></span> :</div>
-        <h3 class="milestone-title"></h3>
-        <p class="milestone-description"></p>
-      </div>
-    </div>
-  </template>
-
-  <template id="milestone-item-template-experienced">
-    <div class="milestone-item" data-id="">
-      <div class="milestone-stamp-container">
-        <img src="public/certified-gold.png" alt="Certified" class="certified-img experienced-stamp">
-      </div>
-      <div class="milestone-content">
-        <div class="milestone-number teal-text">MILESTONE <span class="milestone-num"></span> :</div>
-        <h3 class="milestone-title"></h3>
-        <p class="milestone-description"></p>
-      </div>
-    </div>
-  </template>
+  </div>
 
   <!-- Notification -->
   <div id="notification" class="notification hidden">
@@ -239,32 +73,10 @@
     </div>
   </div>
 
-  <!-- Modal -->
-  <div id="modal" class="modal hidden">
-    <div class="modal-content">
-      <span class="close-modal">&times;</span>
-      <h2 id="modal-title">Change Advisor Level</h2>
-      <div id="modal-body">
-        <p>Changing your advisor level will update your profile but preserve your milestone progress for both levels.</p>
-        <div class="form-group">
-          <label for="new-advisor-type">Select New Level:</label>
-          <select id="new-advisor-type">
-            <option value="rookie">Advisor A (Rookie) (0-1.5 years)</option>
-            <option value="experienced">Advisor B (1.5-2 years)</option>
-          </select>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button id="modal-cancel" class="btn outline-btn">Cancel</button>
-        <button id="modal-confirm" class="btn primary-btn">Confirm Change</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Add a share modal -->
+  <!-- Share Modal -->
   <div id="share-modal" class="modal hidden">
     <div class="modal-content">
-      <span class="close-share-modal">&times;</span>
+      <span class="close-modal" id="close-share-modal">&times;</span>
       <h2>Share Your Passport</h2>
       <p>Share your passport progress with others:</p>
       <div class="form-group">
@@ -273,6 +85,30 @@
           <input type="text" id="share-link" readonly>
           <button id="copy-link-btn" class="btn secondary-btn">Copy</button>
         </div>
+      </div>
+      <div class="share-options">
+        <button id="email-share-btn" class="btn share-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+          Email
+        </button>
+        <button id="whatsapp-share-btn" class="btn share-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+          WhatsApp
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shared Passport Modal -->
+  <div id="shared-passport-modal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-modal" id="close-shared-modal">&times;</span>
+      <h2>Shared Passport Detected</h2>
+      <p>You're trying to view a shared passport, but you already have your own passport data stored in this browser.</p>
+      <p>What would you like to do?</p>
+      <div class="modal-footer">
+        <button id="keep-my-data-btn" class="btn outline-btn">Keep My Data</button>
+        <button id="view-shared-btn" class="btn primary-btn">View Shared Passport</button>
       </div>
     </div>
   </div>

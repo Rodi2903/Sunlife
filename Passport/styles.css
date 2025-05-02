@@ -229,199 +229,96 @@ body {
 /* Passport Book */
 .passport-container {
   margin: 2rem auto;
-  max-width: 800px;
+  max-width: 1000px;
   perspective: 1500px;
 }
 
 .passport-book {
   width: 100%;
-  height: 600px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+  height: 0;
+  padding-bottom: 70.71%; /* Maintain aspect ratio of A4 paper (1:1.414) */
+  position: relative;
   transform-style: preserve-3d;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
 }
 
 /* Turn.js specific styles */
-.passport-book .turn-page {
-  background-color: var(--white);
-}
-
-.hard {
-  background-color: var(--primary-color) !important;
-  color: var(--white);
-  position: relative;
-}
-
-/* Cover styles */
-.cover-front,
-.cover-back {
-  background-image: url("public/leather-texture.png");
-  background-size: cover;
-  background-position: center;
-  color: var(--white);
-  position: relative;
-}
-
-.cover-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  height: 100%;
-  padding: 4rem 2rem;
-  text-align: center;
-}
-
-.sun-logo {
-  margin: 2rem 0;
-}
-
-.sun-life-logo-img {
-  width: 120px;
-  height: auto;
-  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.2));
-}
-
-.cover-content h1 {
-  font-family: "Playfair Display", serif;
-  font-size: 3rem;
-  color: var(--secondary-color);
-  letter-spacing: 4px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  font-weight: 800;
-  margin-top: 2rem;
-}
-
-.cover-bottom {
-  margin-top: auto;
-}
-
-.cover-content h2 {
-  font-family: "Lekton", sans-serif;
-  font-size: 1.5rem;
-  color: var(--secondary-color);
-  letter-spacing: 2px;
-  font-weight: 600;
-}
-
-.cover-content h3 {
-  font-family: "Playfair Display", serif;
-  font-size: 1.5rem;
-  color: var(--secondary-color);
-  letter-spacing: 2px;
-  font-weight: 600;
-}
-
-.back-title {
-  font-family: "Lekton", sans-serif;
-  font-size: 1rem;
-  color: var(--secondary-color);
-  letter-spacing: 1px;
-  margin-top: auto;
-}
-
-/* Inside Cover */
-.inside-cover {
-  background-color: var(--white) !important;
-  color: var(--text-color);
-  position: relative;
-}
-
-.wave-bg {
-  background-image: url("public/wave-pattern.png");
-  background-size: cover;
-  background-position: center;
-}
-
-.inside-page-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  text-align: center;
-  padding: 2rem;
-}
-
-.sun-life-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 2rem;
-}
-
-.title-container {
-  margin-left: 1rem;
-  text-align: left;
-}
-
-.sunlife-title {
-  color: var(--primary-color);
-  font-size: 2.5rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.training-journey {
-  color: var(--secondary-color);
-  font-size: 2rem;
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.ribbon-container {
-  position: relative;
-  margin: 2rem 0;
-}
-
-.ribbon {
-  position: relative;
-  background: var(--secondary-color);
-  color: var(--white);
-  padding: 0.5rem 2rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.ribbon:before,
-.ribbon:after {
-  content: "";
+.passport-book .page {
   position: absolute;
+  width: 50%;
+  height: 100%;
+  background-color: var(--white);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.passport-book .hard {
+  background-color: var(--primary-color);
+}
+
+.passport-book .page-wrapper {
+  -webkit-perspective: 2000px;
+  -moz-perspective: 2000px;
+  perspective: 2000px;
+}
+
+.passport-book .page {
+  width: 100%;
+  height: 100%;
+}
+
+/* Add depth to the center binding */
+.passport-book .shadow {
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.passport-book .even .gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 20px;
   height: 100%;
-  background: var(--secondary-color);
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
+}
+
+.passport-book .odd .gradient {
+  position: absolute;
   top: 0;
+  right: 0;
+  width: 20px;
+  height: 100%;
+  background: linear-gradient(to left, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
 }
 
-.ribbon:before {
-  left: -10px;
-  transform: skewX(-20deg);
-}
-
-.ribbon:after {
-  right: -10px;
-  transform: skewX(20deg);
-}
-
-.passport-description {
-  margin: 2rem 0;
-  font-family: monospace;
-  letter-spacing: 1px;
-  color: var(--primary-color);
-  font-weight: 500;
-  font-size: 1rem;
-}
-
-.certified-stamp {
-  margin-top: 2rem;
-  transition: transform 0.3s ease;
-}
-
-.certified-img {
+/* Interactive stamp styles */
+.stamp-overlay {
+  position: absolute;
   width: 100px;
   height: 100px;
-  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.1));
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.3;
+  z-index: 10;
+}
+
+.stamp-overlay.completed {
+  opacity: 1;
+}
+
+.stamp-overlay:hover {
+  transform: scale(1.05) rotate(5deg);
+}
+
+.stamp-overlay.teal {
+  background-image: url("public/certified-teal.png");
+}
+
+.stamp-overlay.gold {
+  background-image: url("public/certified-gold.png");
 }
 
 /* Binding Effect */
@@ -648,137 +545,49 @@ body {
   margin-top: 1.5rem;
 }
 
-/* Advisor Header */
-.advisor-header {
-  margin-bottom: 2rem;
+/* Inside page content */
+.inside-page-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
   text-align: center;
 }
 
-.advisor-title {
-  color: var(--primary-color);
-  font-size: 1.5rem;
-  display: inline-block;
-  padding-bottom: 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.gold-text {
-  color: var(--secondary-color);
-}
-
-.teal-text {
-  color: var(--primary-color);
-}
-
-.advisor-divider {
-  height: 2px;
-  margin: 0.5rem auto 1.5rem;
-  width: 100%;
-}
-
-.rookie-divider {
-  background-color: var(--secondary-color);
-}
-
-.experienced-divider {
-  background-color: var(--primary-color);
-}
-
-/* Milestones */
-.milestones-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-}
-
-.milestone-item {
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 1.5rem;
-  position: relative;
-  cursor: pointer;
-  display: flex;
-  align-items: flex-start;
-  transition: all 0.3s ease;
-  margin-bottom: 1rem;
-}
-
-.milestone-stamp-container {
-  flex: 0 0 100px;
-  margin-right: 1rem;
-}
-
-.milestone-stamp {
-  transition: transform 0.3s ease;
-}
-
-.milestone-item:hover .milestone-stamp {
-  transform: rotate(5deg);
-}
-
-.milestone-content {
-  flex: 1;
-}
-
-.milestone-number {
-  font-weight: 600;
-  font-size: 0.875rem;
-  margin-bottom: 0.5rem;
-  letter-spacing: 1px;
-}
-
-.milestone-title {
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: var(--primary-color);
-  font-size: 1.5rem;
-  text-transform: uppercase;
-}
-
-.milestone-description {
-  font-size: 0.875rem;
-  color: var(--light-text);
-}
-
-.rookie-stamp {
-  opacity: 0.3;
-}
-
-.rookie-stamp.completed {
-  opacity: 1;
-}
-
-.experienced-stamp {
-  opacity: 0.3;
-}
-
-.experienced-stamp.completed {
-  opacity: 1;
-}
-
-/* Progress Section */
-.progress-section {
+.sun-logo {
   margin-bottom: 2rem;
 }
 
-.data-info {
-  margin-top: 2rem;
-  padding: 1rem;
-  background-color: rgba(0, 65, 101, 0.05);
-  border-radius: 4px;
-  border-left: 3px solid var(--primary-color);
+.sun-life-logo-img {
+  width: 120px;
+  height: auto;
 }
 
-.data-info h3 {
+.sunlife-title {
+  font-size: 2.5rem;
   color: var(--primary-color);
   margin-bottom: 0.5rem;
-  font-weight: 600;
 }
 
-.data-info p {
-  font-size: 0.875rem;
-  margin-bottom: 0.5rem;
-  color: var(--text-color);
+.training-journey {
+  font-size: 1.8rem;
+  color: var(--secondary-color);
+  letter-spacing: 2px;
+}
+
+/* Wave background */
+.wave-bg {
+  background-color: #f9f9f9;
+  background-image: url("public/page-content-wave-bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Progress bar styles */
+.progress-section {
+  margin-bottom: 2rem;
 }
 
 .progress-info {
@@ -805,10 +614,24 @@ body {
   border-radius: 4px;
 }
 
-.completion-message {
-  text-align: center;
+.data-info {
   margin-top: 2rem;
+  padding: 1rem;
+  background-color: rgba(0, 65, 101, 0.05);
+  border-radius: 4px;
+  border-left: 3px solid var(--primary-color);
+}
+
+.data-info h3 {
   color: var(--primary-color);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.data-info p {
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
 }
 
 /* Controls */
@@ -818,6 +641,7 @@ body {
   align-items: center;
   margin-top: 1rem;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .control-btn {
@@ -838,6 +662,19 @@ body {
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.share-btn,
+.print-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.share-btn svg,
+.print-btn svg {
+  width: 16px;
+  height: 16px;
 }
 
 /* Notification */
@@ -951,6 +788,48 @@ body {
   margin-top: 2rem;
 }
 
+.share-link-container {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.share-link-container input {
+  flex: 1;
+}
+
+.share-options {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* Print styles */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .passport-book,
+  .passport-book * {
+    visibility: visible;
+  }
+
+  .passport-book {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: auto;
+    box-shadow: none;
+  }
+
+  .passport-controls,
+  .notification,
+  .modal {
+    display: none !important;
+  }
+}
+
 /* Utility Classes */
 .hidden {
   display: none !important;
@@ -992,31 +871,37 @@ body {
 /* Responsive Styles */
 @media (max-width: 768px) {
   .passport-book {
-    height: 500px;
+    padding-bottom: 141.42%; /* Double the aspect ratio for single page view */
   }
 
-  .milestones-grid {
-    grid-template-columns: 1fr;
+  .passport-book .page {
+    width: 100%; /* Full width for single page view */
   }
 
-  .actions-section {
+  .share-options {
     flex-direction: column;
   }
 
-  .modal-content {
-    width: 90%;
+  .passport-controls {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .sun-life-logo-img {
-    width: 80px;
-  }
-
-  .cover-content h1 {
-    font-size: 2rem;
+  #page-num {
+    align-self: center;
   }
 }
 
 @media (max-width: 480px) {
+  .header h1 {
+    font-size: 1.5rem;
+  }
+
+  .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+
   .passport-book {
     height: 400px;
   }
