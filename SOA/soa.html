@@ -2,13 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SOA Generator</title>
-    <link rel="shortcut icon" href="sun-life-logo.png" type="image/x-icon">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Add jsPDF and html2canvas libraries for PDF generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js"></script>
+    <title>Statement of Account Generator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -16,8 +10,7 @@
             margin: 20px;
         }
         .container {
-            max-width: 500px;
-            width: 100%;
+            max-width: 900px;
             margin: auto;
             background: #fff;
             padding: 20px;
@@ -25,7 +18,7 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         .header {
-            background: #073763;
+            background: #1e3a63;
             color: white;
             padding: 10px;
             text-align: center;
@@ -46,7 +39,7 @@
             width: 250px;
         }
         button {
-            background: #073763;
+            background: #1e3a63;
             color: white;
             border: none;
             padding: 10px 15px;
@@ -55,7 +48,7 @@
             margin-right: 10px;
         }
         button:hover {
-            background: #052745;
+            background: #15294a;
         }
         table {
             width: 100%;
@@ -68,7 +61,7 @@
             border: 1px solid #ddd;
         }
         th {
-            background: #073763;
+            background: #1e3a63;
             color: white;
         }
         tr:nth-child(even) {
@@ -90,11 +83,13 @@
             margin-bottom: 10px;
         }
         .summary-label {
-            width: 60%;
+            width: 50%;
+            font-weight: bold;
         }
         .summary-value {
-            width: 40%;
+            width: 50%;
             text-align: right;
+            font-weight: bold;
         }
         .paid {
             color: green;
@@ -111,128 +106,15 @@
         .future-due {
             font-style: italic;
         }
-        
-        /* PDF specific styles */
-        #pdf-container {
-            display: none;
-            width: 8.5in;
-            padding: 0.5in;
-            font-family: 'Calibri', sans-serif;
-            font-size: 12pt;
-            color: black;
-            background-color: white;
-        }
-        .pdf-header {
-            width: 95%;
-            margin-bottom: 20px;
-            background-color: #073763;
-            padding: 20px;
-            text-align: center;
-        }
-        .pdf-header img {
-            max-width: 100%;
-            height: auto;
-            display: inline-block;
-        }
-        .pdf-date {
-            text-align: right;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
-        .pdf-title {
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            background-color: #073763;
-            color: white;
-            padding: 5px;
-        }
-        .pdf-client-info {
-            margin-bottom: 5px;
-            line-height: 1.5;
-        }
-        .pdf-summary {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        .pdf-summary-left {
-            width: 50%;
-        }
-        .pdf-summary-right {
-            width: 50%;
-            text-align: right;
-        }
-        .pdf-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        .pdf-table th, .pdf-table td {
-            border: none;
-            padding: 8px;
-            text-align: left;
-        }
-        .pdf-table th {
-            background-color: #073763;
-            color: white;
-        }
-        .pdf-table .separator-row {
-            background-color: #d6e9ff;
-            height: 10px;
-        }
-        .pdf-table .data-row {
-            background-color: white;
-        }
-        .pdf-table .paid, .pdf-table .not-paid, .pdf-table .partial-paid {
-            color: black;
-            font-weight: bold;
-        }
-        .pdf-table .future-due {
-            font-style: italic;
-        }
-        
-        /* Loading indicator */
-        .loading {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            text-align: center;
-            color: white;
-        }
-        .loading-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-        .spinner {
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #073763;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 2s linear infinite;
-            margin: 0 auto 20px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div style="margin-bottom:20px;" class="header">
-            <h2>SOA Generator</h2>
+        <div class="header">
+            <h2>Statement of Account Generator</h2>
         </div>
 
+        <!-- Commented out as not used for computation
         <div class="form-group">
             <label>Client Name:</label>
             <input type="text" id="clientName" class="form-control">
@@ -245,6 +127,7 @@
             <label>Policy No:</label>
             <input type="text" id="policyNo" class="form-control">
         </div>
+        -->
         
         <div class="form-group">
             <label>Policy Anniversary:</label>
@@ -271,119 +154,26 @@
             <input type="date" id="currentDate" class="form-control">
         </div>
 
-        <!-- <div class="form-group">
+        <!-- Commented out as not used for computation
+        <div class="form-group">
             <label>Upload Image:</label>
             <input type="file" id="imageUpload" accept="image/*" class="form-control">
-        </div> -->
-
-        <div class="form-group">
-            <label>Header Image:</label>
-            <select id="headerImageSource" class="form-control">
-                <option value="default">Use Default Image</option>
-                <option value="custom">Use Custom URL</option>
-                <option value="upload">Upload Image</option>
-            </select>
-        </div>
-        
-        <div id="customUrlContainer" class="form-group" style="display: none;">
-            <label>Custom Image URL:</label>
-            <input type="text" id="headerImageUrl" class="form-control" value="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/soa%20header%20image-GepdkJ5byUE9Jea1vECqLv65ibEkZK.png">
-        </div>
-        
-        <div id="uploadImageContainer" class="form-group" style="display: none;">
-            <label>Upload Header Image:</label>
-            <input type="file" id="headerImageUpload" accept="image/*" class="form-control">
-            <div id="previewContainer" style="margin-top: 10px; display: none;">
-                <p>Preview:</p>
-                <img id="headerImagePreview" style="max-width: 100%; max-height: 150px;">
-            </div>
         </div>
 
-        <!-- <button onclick="extractFromImage()">Extract from Image</button> -->
-        <button style="margin-top:20px;" onclick="generateSOA()">Generate SOA</button>
-        <button style="margin-top:20px;" onclick="exportToPDF()">Export to PDF</button>
+        <button onclick="extractFromImage()">Extract from Image</button>
+        -->
+        
+        <button onclick="generateSOA()">Generate Statement</button>
 
         <div id="output" style="margin-top: 30px;"></div>
     </div>
 
-    <!-- Hidden container for PDF generation -->
-    <div id="pdf-container">
-        <div class="pdf-header">
-            <img id="pdf-header-img" src="soa-header-image.png" alt="Sun Life Financial">
-        </div>
-        <div class="pdf-date" id="pdf-date"></div>
-        <div class="pdf-title">ACCOUNT SUMMARY</div>
-        <div class="pdf-summary">
-            <div class="pdf-summary-left">
-                <div class="pdf-client-info"><strong>CLIENT'S NAME:</strong> <span id="pdf-client-name"></span></div>
-                <div class="pdf-client-info"><strong>Plan:</strong> <span id="pdf-plan"></span></div>
-                <div class="pdf-client-info"><strong>Policy No:</strong> <span id="pdf-policy-no"></span></div>
-                <div class="pdf-client-info"><strong>Policy Anniversary:</strong> <span id="pdf-anniversary"></span></div>
-            </div>
-            <div class="pdf-summary-right">
-                <div></div><br>
-                <div>Total paid for whole duration: &nbsp; &nbsp; &nbsp; <strong><span style="font-size: 15pt;" id="pdf-total-paid">PHP 0.00</span></strong></div><br>
-                <div></div><br>
-                <div><strong>Balance: &nbsp; &nbsp; &nbsp; <span style="font-size: 15pt;" id="pdf-balance">PHP 0.00</span></strong></div>
-            </div>
-        </div>
-        <table class="pdf-table">
-            <thead>
-                <tr>
-                    <th>Coverage Date</th>
-                    <th>Premium Amount</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody style="font-family: Arial, sans-serif;" id="pdf-table-body">
-                <!-- Will be populated dynamically -->
-            </tbody>
-        </table>
-    
-    <!-- Loading indicator -->
-    <div id="loading" class="loading">
-        <div class="loading-content">
-            <div class="spinner"></div>
-            <p>Generating PDF...</p>
-        </div>
-    </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js"></script>
     <script>
-        // Set current date as default and initialize UI
+        // Set current date as default
         document.addEventListener('DOMContentLoaded', function() {
             const today = new Date();
             document.getElementById('currentDate').value = formatDateForInput(today);
-            
-            // Set up header image source selection
-            document.getElementById('headerImageSource').addEventListener('change', function() {
-                const customUrlContainer = document.getElementById('customUrlContainer');
-                const uploadImageContainer = document.getElementById('uploadImageContainer');
-                
-                if (this.value === 'custom') {
-                    customUrlContainer.style.display = 'block';
-                    uploadImageContainer.style.display = 'none';
-                } else if (this.value === 'upload') {
-                    customUrlContainer.style.display = 'none';
-                    uploadImageContainer.style.display = 'block';
-                } else {
-                    customUrlContainer.style.display = 'none';
-                    uploadImageContainer.style.display = 'none';
-                }
-            });
-            
-            // Set up header image upload preview
-            document.getElementById('headerImageUpload').addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        const img = document.getElementById('headerImagePreview');
-                        img.src = event.target.result;
-                        document.getElementById('previewContainer').style.display = 'block';
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
         });
 
         function formatDateForInput(date) {
@@ -406,13 +196,7 @@
             return `${day}-${month}-${year}`;
         }
 
-        function formatMMDDYYYY(date) {
-            const day = date.getDate().toString().padStart(2, '0');
-            const month = (date.getMonth() + 1).toString().padStart(2, '0');
-            const year = date.getFullYear();
-            return `${month}/${day}/${year}`;
-        }
-
+        /* Commented out as not used for computation
         function extractFromImage() {
             const imageInput = document.getElementById('imageUpload');
             if (!imageInput.files.length) {
@@ -453,15 +237,6 @@
                     document.getElementById('policyAnniversary').value = `${year}-${month}-${day}`;
                 }
 
-                // Try to extract MM/DD/YYYY format
-                const mmddyyyyMatch = text.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-                if (mmddyyyyMatch && !policyAnniversaryMatch) {
-                    const month = mmddyyyyMatch[1].padStart(2, '0');
-                    const day = mmddyyyyMatch[2].padStart(2, '0');
-                    const year = mmddyyyyMatch[3];
-                    document.getElementById('policyAnniversary').value = `${year}-${month}-${day}`;
-                }
-
                 // Extract total paid
                 const totalPaidMatch = text.match(/Total paid for whole duration\s*PHP\s*([0-9,.]+)/);
                 if (totalPaidMatch) {
@@ -475,8 +250,7 @@
                 }
 
                 // Try to determine payment mode based on coverage dates
-                if (text.includes("15-Dec") || text.includes("15-Mar") || text.includes("15-Jun") || 
-                    text.includes("28-Mar") || text.includes("28-Jun") || text.includes("28-Sep")) {
+                if (text.includes("15-Dec") || text.includes("15-Mar") || text.includes("15-Jun")) {
                     document.getElementById('modeOfPayment').value = 'quarterly';
                 }
             });
@@ -499,521 +273,293 @@
             };
             return months[monthName] || "01";
         }
+        */
 
         function generateSOA() {
-            // Get input values
-            const clientName = document.getElementById('clientName').value || "N/A";
-            const planName = document.getElementById('planName').value || "N/A";
-            const policyNo = document.getElementById('policyNo').value || "N/A";
-            const policyAnniversary = new Date(document.getElementById('policyAnniversary').value);
-            let totalPaid = parseFloat(document.getElementById('totalPaid').value) || 0;
-            const periodPremium = parseFloat(document.getElementById('premiumAmount').value) || 0; // This is now per period
-            const modeOfPayment = document.getElementById('modeOfPayment').value;
-            const currentDate = new Date(document.getElementById('currentDate').value);
-
-            // Validate inputs
-            if (!policyAnniversary || !periodPremium) {
-                alert('Please fill in at least the Policy Anniversary and Premium Amount fields.');
-                return;
-            }
-
-            // Calculate payment intervals and annual premium based on mode
-            let intervalsPerYear;
-            switch (modeOfPayment) {
-                case 'quarterly':
-                    intervalsPerYear = 4;
-                    break;
-                case 'monthly':
-                    intervalsPerYear = 12;
-                    break;
-                default: // annual
-                    intervalsPerYear = 1;
-                    break;
-            }
-            
-            // Calculate annual premium and interval amount
-            const annualPremium = periodPremium * intervalsPerYear;
-            const intervalAmount = periodPremium; // This is already per period
-
-            // Generate coverage periods
-            const coveragePeriods = [];
-            let remainingPaid = totalPaid;
-            let totalBalance = 0;
-            let foundCurrentPeriod = false;
-            
-            // Start from the policy anniversary
-            let startYear = policyAnniversary.getFullYear();
-            let startMonth = policyAnniversary.getMonth();
-            let startDay = policyAnniversary.getDate();
-            
-            // Calculate current policy year
-            const currentPolicyYear = currentDate.getFullYear() - startYear + 
-                (currentDate.getMonth() > startMonth || 
-                (currentDate.getMonth() === startMonth && currentDate.getDate() >= startDay) ? 0 : -1);
-            
-            // Generate periods for past years (annual only)
-            for (let year = 0; year < currentPolicyYear; year++) {
-                const periodStartYear = startYear + year;
-                const startDate = new Date(periodStartYear, startMonth, startDay);
-                const endDate = new Date(periodStartYear + 1, startMonth, startDay);
-                
-                // Calculate payment status
-                let status, statusText, amountPaid = 0;
-                
-                if (remainingPaid >= annualPremium) {
-                    status = 'PAID';
-                    statusText = 'PAID';
-                    amountPaid = annualPremium;
-                    remainingPaid -= annualPremium;
-                } else if (remainingPaid > 0) {
-                    status = 'PARTIAL';
-                    amountPaid = remainingPaid;
-                    const balance = annualPremium - remainingPaid;
-                    statusText = `PAID ${amountPaid.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} with balance ${balance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-                    totalBalance += balance;
-                    remainingPaid = 0;
-                } else {
-                    status = 'NOT_PAID';
-                    statusText = 'NOT PAID';
-                    totalBalance += annualPremium;
-                }
-                
-                coveragePeriods.push({
-                    startDate,
-                    endDate,
-                    amount: annualPremium,
-                    status,
-                    statusText,
-                    amountPaid,
-                    containsCurrentDate: false,
-                    afterCurrentPeriod: false
-                });
-            }
-            
-            // Generate periods for current year (broken down by mode of payment)
-            const currentPeriodStartYear = startYear + currentPolicyYear;
-            
-            if (modeOfPayment === 'annual') {
-                // For annual payments, create one period for current year
-                const startDate = new Date(currentPeriodStartYear, startMonth, startDay);
-                const endDate = new Date(currentPeriodStartYear + 1, startMonth, startDay);
-                
-                // Check if this period contains the current date
-                const containsCurrentDate = currentDate >= startDate && currentDate < endDate;
-                if (containsCurrentDate) {
-                    foundCurrentPeriod = true;
-                }
-                
-                // Calculate payment status
-                let status, statusText, amountPaid = 0;
-                
-                if (remainingPaid >= annualPremium) {
-                    status = 'PAID';
-                    statusText = 'PAID';
-                    amountPaid = annualPremium;
-                    remainingPaid -= annualPremium;
-                } else if (remainingPaid > 0) {
-                    status = 'PARTIAL';
-                    amountPaid = remainingPaid;
-                    const balance = annualPremium - remainingPaid;
-                    statusText = `PAID ${amountPaid.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} with balance ${balance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-                    
-                    // Only add to balance if this is the current period or before
-                    if (!foundCurrentPeriod || containsCurrentDate) {
-                        totalBalance += balance;
-                    }
-                    
-                    remainingPaid = 0;
-                } else {
-                    status = 'NOT_PAID';
-                    statusText = 'NOT PAID';
-                    
-                    // Only add to balance if this is the current period or before
-                    if (!foundCurrentPeriod || containsCurrentDate) {
-                        totalBalance += annualPremium;
-                    }
-                }
-                
-                // Add future due indicator if this period contains the current date
-                if (containsCurrentDate && status !== 'PAID') {
-                    statusText += ', FUTURE DUE';
-                }
-                
-                coveragePeriods.push({
-                    startDate,
-                    endDate,
-                    amount: annualPremium,
-                    status,
-                    statusText,
-                    amountPaid,
-                    containsCurrentDate,
-                    afterCurrentPeriod: false
-                });
-            } else {
-                // For quarterly/monthly payments, create multiple periods for current year
-                const monthsPerInterval = 12 / intervalsPerYear;
-                
-                for (let i = 0; i < intervalsPerYear; i++) {
-                    const intervalStartDate = new Date(currentPeriodStartYear, startMonth + (i * monthsPerInterval), startDay);
-                    const intervalEndDate = new Date(
-                        i === intervalsPerYear - 1 
-                            ? currentPeriodStartYear + 1 
-                            : currentPeriodStartYear, 
-                        i === intervalsPerYear - 1 
-                            ? startMonth 
-                            : startMonth + ((i + 1) * monthsPerInterval), 
-                        startDay
-                    );
-                    
-                    // Check if this period contains the current date
-                    const containsCurrentDate = currentDate >= intervalStartDate && currentDate < intervalEndDate;
-                    const afterCurrentPeriod = foundCurrentPeriod;
-                    
-                    if (containsCurrentDate) {
-                        foundCurrentPeriod = true;
-                    }
-                    
-                    // Calculate payment status
-                    let status, statusText, amountPaid = 0;
-                    
-                    if (remainingPaid >= intervalAmount) {
-                        status = 'PAID';
-                        statusText = 'PAID';
-                        amountPaid = intervalAmount;
-                        remainingPaid -= intervalAmount;
-                    } else if (remainingPaid > 0) {
-                        status = 'PARTIAL';
-                        amountPaid = remainingPaid;
-                        const balance = intervalAmount - remainingPaid;
-                        statusText = `PAID ${amountPaid.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} with balance ${balance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-                        
-                        // Only add to balance if this is the current period or before
-                        if (!afterCurrentPeriod) {
-                            totalBalance += balance;
-                        }
-                        
-                        remainingPaid = 0;
-                    } else {
-                        status = 'NOT_PAID';
-                        statusText = 'NOT PAID';
-                        
-                        // Only add to balance if this is the current period or before
-                        if (!afterCurrentPeriod) {
-                            totalBalance += intervalAmount;
-                        }
-                    }
-                    
-                    // Add future due indicator only if this period contains the current date
-                    if (containsCurrentDate && status !== 'PAID') {
-                        statusText += ', FUTURE DUE';
-                    }
-                    
-                    coveragePeriods.push({
-                        startDate: intervalStartDate,
-                        endDate: intervalEndDate,
-                        amount: intervalAmount,
-                        status,
-                        statusText,
-                        amountPaid,
-                        containsCurrentDate,
-                        afterCurrentPeriod
-                    });
-                }
-            }
-
-            // Generate HTML output
-            let output = `
-                <div class="account-summary">
-                    <h3>ACCOUNT SUMMARY</h3>
-                    <div class="summary-row">
-                        <div class="summary-label"><strong>CLIENT:</strong> ${clientName}</div>
-                        <div class="summary-value"><strong>Total paid:</strong> PHP ${totalPaid.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
-                    </div>
-                    <div class="summary-row">
-                        <div class="summary-label"><strong>Plan:</strong> ${planName}</div>
-                        <div class="summary-value"><strong>Balance</strong> PHP ${totalBalance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
-                    </div>
-                    <div class="summary-row">
-                        <div class="summary-label"><strong>Policy No:</strong> ${policyNo}</div>
-                    </div>
-                    <div class="summary-row">
-                        <div class="summary-label"><strong>Policy Anniversary:</strong> ${formatDisplayDate(policyAnniversary)}</div>
-                    </div>
-                </div>
-                
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Coverage Date</th>
-                            <th>Premium Amount</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
-            // Add coverage periods to table
-            coveragePeriods.forEach(period => {
-                const startDateStr = formatDisplayDate(period.startDate);
-                const endDateStr = formatDisplayDate(period.endDate);
-                const amountStr = `PHP ${period.amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-                
-                let statusClass = '';
-                if (period.status === 'PAID') statusClass = 'paid';
-                else if (period.status === 'PARTIAL') statusClass = 'partial-paid';
-                else statusClass = 'not-paid';
-                
-                if (period.statusText.includes('FUTURE DUE')) statusClass += ' future-due';
-                
-                output += `
-                    <tr>
-                        <td>${startDateStr} to ${endDateStr}</td>
-                        <td>${amountStr}</td>
-                        <td class="${statusClass}">${period.statusText}</td>
-                    </tr>
-                `;
-            });
-
-            output += `
-                    </tbody>
-                </table>
-            `;
-
-            document.getElementById('output').innerHTML = output;
-            
-            // Also update the PDF container with the data
-            updatePdfContainer(clientName, planName, policyNo, policyAnniversary, totalPaid, totalBalance, coveragePeriods, currentDate);
-        }
-        
-        // Function to update the PDF container with data
-function updatePdfContainer(clientName, planName, policyNo, policyAnniversary, totalPaid, totalBalance, coveragePeriods, currentDate) {
-    // Set header image based on selection
-    const headerImageSource = document.getElementById('headerImageSource').value;
-    let headerImageUrl;
-    
-    if (headerImageSource === 'custom') {
-        headerImageUrl = document.getElementById('headerImageUrl').value;
-    } else if (headerImageSource === 'upload') {
-        const headerImageUpload = document.getElementById('headerImageUpload');
-        if (headerImageUpload.files.length > 0) {
-            headerImageUrl = document.getElementById('headerImagePreview').src;
-        } else {
-            // Default fallback image
-            headerImageUrl = "soa-header-image.png";
-        }
-    } else {
-        // Default image
-        headerImageUrl = "soa-header-image.png";
-    }
-    
-    // Set the image in the PDF container
-    const headerImg = document.getElementById('pdf-header-img');
-    headerImg.src = headerImageUrl;
-    
-    // Set date
-    document.getElementById('pdf-date').textContent = formatMMDDYYYY(currentDate);
-    
-    // Set client info
-    document.getElementById('pdf-client-name').textContent = clientName;
-    document.getElementById('pdf-plan').textContent = planName;
-    document.getElementById('pdf-policy-no').textContent = policyNo;
-    document.getElementById('pdf-anniversary').textContent = formatDisplayDate(policyAnniversary);
-    
-    // Set payment info
-    document.getElementById('pdf-total-paid').textContent = `PHP ${totalPaid.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-    document.getElementById('pdf-balance').textContent = `PHP ${totalBalance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-    
-    // Set table rows
-    const tableBody = document.getElementById('pdf-table-body');
-    tableBody.innerHTML = '';
-    
-    // Get payment mode
+    // Get input values
+    // Using default values for commented out fields
+    const clientName = "N/A"; // Default value since input is commented out
+    const planName = "N/A"; // Default value since input is commented out
+    const policyNo = "N/A"; // Default value since input is commented out
+    const policyAnniversary = new Date(document.getElementById('policyAnniversary').value);
+    let totalPaid = parseFloat(document.getElementById('totalPaid').value) || 0;
+    const periodPremium = parseFloat(document.getElementById('premiumAmount').value) || 0; // This is now per period
     const modeOfPayment = document.getElementById('modeOfPayment').value;
+    const currentDate = new Date(document.getElementById('currentDate').value);
+
+    // Validate inputs
+    if (!policyAnniversary || !periodPremium) {
+        alert('Please fill in at least the Policy Anniversary and Premium Amount fields.');
+        return;
+    }
+
+    // Calculate payment intervals and annual premium based on mode
+    let intervalsPerYear;
+    switch (modeOfPayment) {
+        case 'quarterly':
+            intervalsPerYear = 4;
+            break;
+        case 'monthly':
+            intervalsPerYear = 12;
+            break;
+        default: // annual
+            intervalsPerYear = 1;
+            break;
+    }
     
-    // Group periods by year for annual mode
-    if (modeOfPayment === 'annual') {
-        let lastYear = null;
+    // Calculate annual premium and interval amount
+    const annualPremium = periodPremium * intervalsPerYear;
+    const intervalAmount = periodPremium; // This is already per period
+
+    // Generate coverage periods
+    const coveragePeriods = [];
+    let remainingPaid = totalPaid;
+    let totalBalance = 0;
+    let foundCurrentPeriod = false;
+    
+    // Start from the policy anniversary
+    let startYear = policyAnniversary.getFullYear();
+    let startMonth = policyAnniversary.getMonth();
+    let startDay = policyAnniversary.getDate();
+    
+    // Calculate current policy year
+    const currentPolicyYear = currentDate.getFullYear() - startYear + 
+        (currentDate.getMonth() > startMonth || 
+        (currentDate.getMonth() === startMonth && currentDate.getDate() >= startDay) ? 0 : -1);
+    
+    // Generate periods for past years (annual only)
+    for (let year = 0; year < currentPolicyYear; year++) {
+        const periodStartYear = startYear + year;
+        const startDate = new Date(periodStartYear, startMonth, startDay);
+        const endDate = new Date(periodStartYear + 1, startMonth, startDay);
         
-        coveragePeriods.forEach((period, index) => {
-            const currentYear = period.startDate.getFullYear();
-            
-            // Create data row
-            const dataRow = document.createElement('tr');
-            dataRow.className = 'data-row';
-            
-            const dateCell = document.createElement('td');
-            dateCell.textContent = `${formatDisplayDate(period.startDate)} to ${formatDisplayDate(period.endDate)}`;
-            
-            const amountCell = document.createElement('td');
-            amountCell.textContent = `PHP ${period.amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-            
-            const statusCell = document.createElement('td');
-            
-            // Format status text with proper commas for amounts
-            let statusText = period.statusText;
-            if (period.status === 'PARTIAL') {
-                const paidMatch = statusText.match(/PAID\s+(\d+\.\d+)/);
-                const balanceMatch = statusText.match(/balance\s+(\d+\.\d+)/);
-                
-                if (paidMatch && balanceMatch) {
-                    const paidAmount = parseFloat(paidMatch[1]);
-                    const balanceAmount = parseFloat(balanceMatch[1]);
-                    
-                    statusText = `PAID ${paidAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} with balance ${balanceAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-                    
-                    if (period.statusText.includes('FUTURE DUE')) {
-                        statusText += ', FUTURE DUE';
-                    }
-                }
-            }
-            
-            statusCell.textContent = statusText;
-            
-            dataRow.appendChild(dateCell);
-            dataRow.appendChild(amountCell);
-            dataRow.appendChild(statusCell);
-            
-            tableBody.appendChild(dataRow);
-            
-            // Add separator row after each entry except the last one
-            if (index < coveragePeriods.length - 1) {
-                const separatorRow = document.createElement('tr');
-                separatorRow.className = 'separator-row';
-                const separatorCell = document.createElement('td');
-                separatorCell.colSpan = 3;
-                separatorCell.innerHTML = '&nbsp;';
-                separatorRow.appendChild(separatorCell);
-                tableBody.appendChild(separatorRow);
-            }
-        });
-    } else {
-        // For quarterly/monthly, just add all rows without separators
-        coveragePeriods.forEach(period => {
-            const row = document.createElement('tr');
-            row.className = 'data-row';
-            
-            const dateCell = document.createElement('td');
-            dateCell.textContent = `${formatDisplayDate(period.startDate)} to ${formatDisplayDate(period.endDate)}`;
-            
-            const amountCell = document.createElement('td');
-            amountCell.textContent = `PHP ${period.amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-            
-            const statusCell = document.createElement('td');
-            
-            // Format status text with proper commas for amounts
-            let statusText = period.statusText;
-            if (period.status === 'PARTIAL') {
-                const paidMatch = statusText.match(/PAID\s+(\d+\.\d+)/);
-                const balanceMatch = statusText.match(/balance\s+(\d+\.\d+)/);
-                
-                if (paidMatch && balanceMatch) {
-                    const paidAmount = parseFloat(paidMatch[1]);
-                    const balanceAmount = parseFloat(balanceMatch[1]);
-                    
-                    statusText = `PAID ${paidAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} with balance ${balanceAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-                    
-                    if (period.statusText.includes('FUTURE DUE')) {
-                        statusText += ', FUTURE DUE';
-                    }
-                }
-            }
-            
-            statusCell.textContent = statusText;
-            
-            row.appendChild(dateCell);
-            row.appendChild(amountCell);
-            row.appendChild(statusCell);
-            
-            tableBody.appendChild(row);
+        // Calculate payment status
+        let status, statusText, amountPaid = 0;
+        
+        if (remainingPaid >= annualPremium) {
+            status = 'PAID';
+            statusText = 'PAID';
+            amountPaid = annualPremium;
+            remainingPaid -= annualPremium;
+        } else if (remainingPaid > 0) {
+            status = 'PARTIAL';
+            amountPaid = remainingPaid;
+            const balance = annualPremium - remainingPaid;
+            statusText = `PAID ${amountPaid.toFixed(2)} with balance ${balance.toFixed(2)}`;
+            totalBalance += balance;
+            remainingPaid = 0;
+        } else {
+            status = 'NOT_PAID';
+            statusText = 'NOT PAID';
+            totalBalance += annualPremium;
+        }
+        
+        coveragePeriods.push({
+            startDate,
+            endDate,
+            amount: annualPremium,
+            status,
+            statusText,
+            amountPaid,
+            containsCurrentDate: false,
+            afterCurrentPeriod: false
         });
     }
-}
+    
+    // Generate periods for current year (broken down by mode of payment)
+    const currentPeriodStartYear = startYear + currentPolicyYear;
+    
+    if (modeOfPayment === 'annual') {
+        // For annual payments, create one period for current year
+        const startDate = new Date(currentPeriodStartYear, startMonth, startDay);
+        const endDate = new Date(currentPeriodStartYear + 1, startMonth, startDay);
         
-        // Function to export the SOA to PDF
-        function exportToPDF() {
-            // Make sure SOA is generated first
-            if (!document.getElementById('output').innerHTML) {
-                alert('Please generate the SOA first before exporting to PDF.');
-                return;
+        // Check if this period contains the current date
+        const containsCurrentDate = currentDate >= startDate && currentDate < endDate;
+        if (containsCurrentDate) {
+            foundCurrentPeriod = true;
+        }
+        
+        // Calculate payment status
+        let status, statusText, amountPaid = 0;
+        
+        if (remainingPaid >= annualPremium) {
+            status = 'PAID';
+            statusText = 'PAID';
+            amountPaid = annualPremium;
+            remainingPaid -= annualPremium;
+        } else if (remainingPaid > 0) {
+            status = 'PARTIAL';
+            amountPaid = remainingPaid;
+            const balance = annualPremium - remainingPaid;
+            statusText = `PAID ${amountPaid.toFixed(2)} with balance ${balance.toFixed(2)}`;
+            
+            // Only add to balance if this is the current period or before
+            if (!foundCurrentPeriod || containsCurrentDate) {
+                totalBalance += balance;
             }
             
-            // Show loading indicator
-            document.getElementById('loading').style.display = 'block';
+            remainingPaid = 0;
+        } else {
+            status = 'NOT_PAID';
+            statusText = 'NOT PAID';
             
-            // Get the PDF container
-            const pdfContainer = document.getElementById('pdf-container');
-            
-            // Make sure the container is visible for html2canvas
-            pdfContainer.style.display = 'block';
-            
-            // Create a new image element to preload the header image
-            const preloadImg = new Image();
-            preloadImg.crossOrigin = "Anonymous"; // Important for CORS
-            
-            // Get the header image URL
-            const headerImg = document.getElementById('pdf-header-img');
-            const headerImageUrl = headerImg.src;
-            
-            preloadImg.onload = function() {
-                // Replace the header image with the preloaded one
-                headerImg.src = preloadImg.src;
-                
-                // Wait a moment to ensure the DOM is updated
-                setTimeout(function() {
-                    // Use html2canvas to capture the PDF container
-                    html2canvas(pdfContainer, {
-                        scale: 2, // Higher scale for better quality
-                        useCORS: true, // Allow loading cross-origin images
-                        logging: false,
-                        allowTaint: true, // Allow tainted canvas
-                        backgroundColor: "white" // Ensure white background
-                    }).then(canvas => {
-                        // Hide the PDF container again
-                        pdfContainer.style.display = 'none';
-                        
-                        // Create PDF
-                        const { jsPDF } = window.jspdf;
-                        const pdf = new jsPDF('p', 'mm', 'a4');
-                        
-                        const imgData = canvas.toDataURL('image/png');
-                        const imgWidth = 210; // A4 width in mm
-                        const imgHeight = canvas.height * imgWidth / canvas.width;
-                        
-                        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-                        
-                        // Get client name for filename
-                        const clientName = document.getElementById('clientName').value || "Client";
-                        
-                        // Save the PDF with client name in filename
-                        pdf.save(`STATEMENT OF ACCOUNT - ${clientName}.pdf`);
-                        
-                        // Hide loading indicator
-                        document.getElementById('loading').style.display = 'none';
-                    }).catch(error => {
-                        console.error('Error generating PDF:', error);
-                        alert('Error generating PDF. Please check console for details.');
-                        pdfContainer.style.display = 'none';
-                        document.getElementById('loading').style.display = 'none';
-                    });
-                }, 500);
-            };
-            
-            preloadImg.onerror = function() {
-                console.error('Error loading header image');
-                alert('Error loading header image. Using a placeholder instead.');
-                
-                // Use a simple placeholder image instead
-                headerImg.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
-                
-                // Try again with the placeholder
-                setTimeout(function() {
-                    exportToPDF();
-                }, 100);
-            };
-            
-            // Start loading the image
-            preloadImg.src = headerImageUrl;
+            // Only add to balance if this is the current period or before
+            if (!foundCurrentPeriod || containsCurrentDate) {
+                totalBalance += annualPremium;
+            }
         }
+        
+        // Add future due indicator if this period contains the current date
+        if (containsCurrentDate && status !== 'PAID') {
+            statusText += ', FUTURE DUE';
+        }
+        
+        coveragePeriods.push({
+            startDate,
+            endDate,
+            amount: annualPremium,
+            status,
+            statusText,
+            amountPaid,
+            containsCurrentDate,
+            afterCurrentPeriod: false
+        });
+    } else {
+        // For quarterly/monthly payments, create multiple periods for current year
+        const monthsPerInterval = 12 / intervalsPerYear;
+        
+        for (let i = 0; i < intervalsPerYear; i++) {
+            const intervalStartDate = new Date(currentPeriodStartYear, startMonth + (i * monthsPerInterval), startDay);
+            const intervalEndDate = new Date(
+                i === intervalsPerYear - 1 
+                    ? currentPeriodStartYear + 1 
+                    : currentPeriodStartYear, 
+                i === intervalsPerYear - 1 
+                    ? startMonth 
+                    : startMonth + ((i + 1) * monthsPerInterval), 
+                startDay
+            );
+            
+            // Check if this period contains the current date
+            const containsCurrentDate = currentDate >= intervalStartDate && currentDate < intervalEndDate;
+            const afterCurrentPeriod = foundCurrentPeriod;
+            
+            if (containsCurrentDate) {
+                foundCurrentPeriod = true;
+            }
+            
+            // Calculate payment status
+            let status, statusText, amountPaid = 0;
+            
+            if (remainingPaid >= intervalAmount) {
+                status = 'PAID';
+                statusText = 'PAID';
+                amountPaid = intervalAmount;
+                remainingPaid -= intervalAmount;
+            } else if (remainingPaid > 0) {
+                status = 'PARTIAL';
+                amountPaid = remainingPaid;
+                const balance = intervalAmount - remainingPaid;
+                statusText = `PAID ${amountPaid.toFixed(2)} with balance ${balance.toFixed(2)}`;
+                
+                // Only add to balance if this is the current period or before
+                if (!afterCurrentPeriod) {
+                    totalBalance += balance;
+                }
+                
+                remainingPaid = 0;
+            } else {
+                status = 'NOT_PAID';
+                statusText = 'NOT PAID';
+                
+                // Only add to balance if this is the current period or before
+                if (!afterCurrentPeriod) {
+                    totalBalance += intervalAmount;
+                }
+            }
+            
+            // Add future due indicator only if this period contains the current date
+            if (containsCurrentDate && status !== 'PAID') {
+                statusText += ', FUTURE DUE';
+            }
+            
+            coveragePeriods.push({
+                startDate: intervalStartDate,
+                endDate: intervalEndDate,
+                amount: intervalAmount,
+                status,
+                statusText,
+                amountPaid,
+                containsCurrentDate,
+                afterCurrentPeriod
+            });
+        }
+    }
+
+    // Generate HTML output
+    let output = `
+        <div class="account-summary">
+            <h3>ACCOUNT SUMMARY</h3>
+            <div class="summary-row">
+                <div class="summary-label">CLIENT'S NAME: ${clientName}</div>
+                <div class="summary-label">Total paid for whole duration</div>
+                <div class="summary-value">PHP ${totalPaid.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+            </div>
+            <div class="summary-row">
+                <div class="summary-label">Plan: ${planName}</div>
+                <div class="summary-label">Balance</div>
+                <div class="summary-value">PHP ${totalBalance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+            </div>
+            <div class="summary-row">
+                <div class="summary-label">Policy No: ${policyNo}</div>
+            </div>
+            <div class="summary-row">
+                <div class="summary-label">Policy Anniversary: ${formatDisplayDate(policyAnniversary)}</div>
+            </div>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Coverage Date</th>
+                    <th>Premium Amount</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    // Add coverage periods to table
+    coveragePeriods.forEach(period => {
+        const startDateStr = formatDisplayDate(period.startDate);
+        const endDateStr = formatDisplayDate(period.endDate);
+        const amountStr = `PHP ${period.amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        
+        let statusClass = '';
+        if (period.status === 'PAID') statusClass = 'paid';
+        else if (period.status === 'PARTIAL') statusClass = 'partial-paid';
+        else statusClass = 'not-paid';
+        
+        if (period.statusText.includes('FUTURE DUE')) statusClass += ' future-due';
+        
+        output += `
+            <tr>
+                <td>${startDateStr} to ${endDateStr}</td>
+                <td>${amountStr}</td>
+                <td class="${statusClass}">${period.statusText}</td>
+            </tr>
+        `;
+    });
+
+    output += `
+            </tbody>
+        </table>
+    `;
+
+    document.getElementById('output').innerHTML = output;
+}
     </script>
 </body>
 </html>
+
