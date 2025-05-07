@@ -216,6 +216,59 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        /* Editable status cell styles */
+        .editable-status {
+            cursor: pointer;
+            min-height: 20px;
+            min-width: 100px;
+            padding: 5px;
+            border: 1px dashed transparent;
+            position: relative;
+        }
+        .editable-status:hover {
+            border: 1px dashed #073763;
+            background-color: #f0f8ff;
+        }
+        .editable-status:focus {
+            outline: none;
+            border: 1px solid #073763;
+            background-color: #f0f8ff;
+        }
+        .editable-status::after {
+            content: "✎";
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            font-size: 12px;
+            opacity: 0.5;
+            color: #073763;
+        }
+        .editable-status:hover::after {
+            opacity: 1;
+        }
+        
+        /* Instruction box styles */
+        .instruction-box {
+            background-color: #f0f8ff;
+            border-left: 4px solid #073763;
+            padding: 10px 15px;
+            margin: 15px 0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .instruction-box h4 {
+            margin-top: 0;
+            margin-bottom: 5px;
+            color: #073763;
+        }
+        .instruction-box ul {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        .instruction-box li {
+            margin-bottom: 5px;
+        }
     </style>
 </head>
 <body>
@@ -332,6 +385,7 @@
                 <!-- Will be populated dynamically -->
             </tbody>
         </table>
+    </div>
     
     <!-- Loading indicator -->
     <div id="loading" class="loading">
@@ -377,7 +431,57 @@
                     reader.readAsDataURL(file);
                 }
             });
+            
+            // Set up event delegation for editable status cells
+            document.addEventListener('click', function(e) {
+                if (e.target && e.target.classList.contains('editable-status')) {
+                    makeEditable(e.target);
+                }
+            });
         });
+
+        // Make a cell editable
+        function makeEditable(cell) {
+            cell.contentEditable = true;
+            cell.focus();
+            
+            // Save the original content to restore if needed
+            cell.dataset.originalContent = cell.textContent;
+            
+            // Handle blur event to save changes
+            cell.onblur = function() {
+                cell.contentEditable = false;
+                
+                // Update the PDF table with the edited content
+                updatePdfTableWithEditedStatus();
+            };
+            
+            // Handle key events
+            cell.onkeydown = function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    cell.blur();
+                } else if (e.key === 'Escape') {
+                    cell.textContent = cell.dataset.originalContent;
+                    cell.blur();
+                }
+            };
+        }
+        
+        // Update the PDF table with edited status values
+        function updatePdfTableWithEditedStatus() {
+            // Get all status cells from the visible table
+            const statusCells = document.querySelectorAll('#output table tbody td.editable-status');
+            const pdfTableRows = document.querySelectorAll('#pdf-table-body tr.data-row');
+            
+            // Update each PDF table row with the corresponding edited status
+            for (let i = 0; i < Math.min(statusCells.length, pdfTableRows.length); i++) {
+                const statusCell = pdfTableRows[i].querySelector('td:nth-child(3)');
+                if (statusCell) {
+                    statusCell.textContent = statusCells[i].textContent;
+                }
+            }
+        }
 
         function formatDateForInput(date) {
             return date.toISOString().split('T')[0];
@@ -570,7 +674,15 @@
                     status = 'PARTIAL';
                     amountPaid = remainingPaid;
                     const balance = annualPremium - remainingPaid;
-                    statusText = `PAID ${amountPaid.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} with balance ${balance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                    
+                    // Fix for "PAID 0.00 with balance X" issue
+                    if (amountPaid === 0 || amountPaid < 0.01) {
+                        status = 'NOT_PAID';
+                        statusText = 'NOT PAID';
+                    } else {
+                        statusText = `PAID ${amountPaid.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} with balance ${balance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                    }
+                    
                     totalBalance += balance;
                     remainingPaid = 0;
                 } else {
@@ -617,7 +729,14 @@
                     status = 'PARTIAL';
                     amountPaid = remainingPaid;
                     const balance = annualPremium - remainingPaid;
-                    statusText = `PAID ${amountPaid.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} with balance ${balance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                    
+                    // Fix for "PAID 0.00 with balance X" issue
+                    if (amountPaid === 0 || amountPaid < 0.01) {
+                        status = 'NOT_PAID';
+                        statusText = 'NOT PAID';
+                    } else {
+                        statusText = `PAID ${amountPaid.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} with balance ${balance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                    }
                     
                     // Only add to balance if this is the current period or before
                     if (!foundCurrentPeriod || containsCurrentDate) {
@@ -686,7 +805,14 @@
                         status = 'PARTIAL';
                         amountPaid = remainingPaid;
                         const balance = intervalAmount - remainingPaid;
-                        statusText = `PAID ${amountPaid.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} with balance ${balance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                        
+                        // Fix for "PAID 0.00 with balance X" issue
+                        if (amountPaid === 0 || amountPaid < 0.01) {
+                            status = 'NOT_PAID';
+                            statusText = 'NOT PAID';
+                        } else {
+                            statusText = `PAID ${amountPaid.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} with balance ${balance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                        }
                         
                         // Only add to balance if this is the current period or before
                         if (!afterCurrentPeriod) {
@@ -722,8 +848,19 @@
                 }
             }
 
-            // Generate HTML output
+            // Generate HTML output with instruction box for editable status
             let output = `
+                <div class="instruction-box">
+                    <h4>Editable Status Column</h4>
+                    <p>The "Status" column in the table below is editable. You can:</p>
+                    <ul>
+                        <li>Click on any status to edit it</li>
+                        <li>Press Enter to save your changes</li>
+                        <li>Press Escape to cancel</li>
+                    </ul>
+                    <p><strong>Your edits will be included when you export to PDF.</strong></p>
+                </div>
+                
                 <div class="account-summary">
                     <h3>ACCOUNT SUMMARY</h3>
                     <div class="summary-row">
@@ -747,7 +884,7 @@
                         <tr>
                             <th>Coverage Date</th>
                             <th>Premium Amount</th>
-                            <th>Status</th>
+                            <th>Status <span style="font-size: 12px; font-weight: normal;">(click to edit)</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -770,7 +907,7 @@
                     <tr>
                         <td>${startDateStr} to ${endDateStr}</td>
                         <td>${amountStr}</td>
-                        <td class="${statusClass}">${period.statusText}</td>
+                        <td class="${statusClass} editable-status" data-original-status="${period.statusText}">${period.statusText}</td>
                     </tr>
                 `;
             });
@@ -986,6 +1123,9 @@ function updatePdfContainer(clientName, planName, policyNo, policyAnniversary, t
         finalSeparatorRow.appendChild(finalSeparatorCell);
         tableBody.appendChild(finalSeparatorRow);
     }
+    
+    // Update the PDF table with any edited status values from the main table
+    updatePdfTableWithEditedStatus();
 }
         
         // Function to export the SOA to PDF
@@ -995,6 +1135,9 @@ function updatePdfContainer(clientName, planName, policyNo, policyAnniversary, t
                 alert('Please generate the SOA first before exporting to PDF.');
                 return;
             }
+            
+            // Update the PDF table with any edited status values
+            updatePdfTableWithEditedStatus();
             
             // Show loading indicator
             document.getElementById('loading').style.display = 'block';
