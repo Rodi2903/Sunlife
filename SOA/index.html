@@ -269,6 +269,20 @@
         .instruction-box li {
             margin-bottom: 5px;
         }
+        
+        /* Lapsed policy styles */
+        .lapsed-balance {
+            color: red !important;
+        }
+        
+        /* Status dropdown styles */
+        .status-dropdown {
+            padding: 3px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background-color: white;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
@@ -308,6 +322,13 @@
                 <option value="annual">Annual</option>
                 <option value="quarterly">Quarterly</option>
                 <option value="monthly">Monthly</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Policy Status:</label>
+            <select id="policyStatus" class="form-control">
+                <option value="premium-paying">Premium Paying</option>
+                <option value="lapsed">Lapsed</option>
             </select>
         </div>
         <div class="form-group">
@@ -364,6 +385,7 @@
                 <div class="pdf-client-info"><strong>Plan:</strong> <span id="pdf-plan"></span></div>
                 <div class="pdf-client-info"><strong>Policy No:</strong> <span id="pdf-policy-no"></span></div>
                 <div class="pdf-client-info"><strong>Policy Anniversary:</strong> <span id="pdf-anniversary"></span></div>
+                <div class="pdf-client-info"><strong>Policy Status:</strong> <span id="pdf-policy-status"></span></div>
             </div>
             <div class="pdf-summary-right">
                 <div></div><br>
@@ -438,13 +460,104 @@
                     makeEditable(e.target);
                 }
             });
+            
+            // Set up policy status change event
+            document.getElementById('policyStatus').addEventListener('change', function() {
+                // If SOA is already generated, update the PDF container with the new policy status
+                if (document.getElementById('output').innerHTML) {
+                    updatePdfContainerPolicyStatus();
+                }
+            });
         });
 
         // Make a cell editable
         function makeEditable(cell) {
-            cell.contentEditable = true;
-            cell.focus();
+            // Create a dropdown for status options
+            const dropdown = document.createElement('select');
+            dropdown.className = 'status-dropdown';
             
+            // Add common status options
+            const options = [
+                { value: 'PAID', text: 'PAID' },
+                { value: 'NOT PAID', text: 'NOT PAID' },
+                { value: 'FUTURE DUE', text: 'FUTURE DUE' }
+            ];
+            
+            // Add the current value as an option if it's not in the list
+            const currentValue = cell.textContent.trim();
+            let hasCurrentValue = false;
+            
+            for (const option of options) {
+                if (currentValue === option.text) {
+                    hasCurrentValue = true;
+                    break;
+                }
+            }
+            
+            if (!hasCurrentValue) {
+                options.push({ value: currentValue, text: currentValue });
+            }
+            
+            // Create option elements
+            options.forEach(option => {
+                const optionElement = document.createElement('option');
+                optionElement.value = option.value;
+                optionElement.textContent = option.text;
+                
+                if (option.text === currentValue) {
+                    optionElement.selected = true;
+                }
+                
+                dropdown.appendChild(optionElement);
+            });
+            
+            // Add custom option at the end
+            const customOption = document.createElement('option');
+            customOption.value = 'CUSTOM';
+            customOption.textContent = 'Custom...';
+            dropdown.appendChild(customOption);
+            
+            // Clear the cell and add the dropdown
+            cell.textContent = '';
+            cell.appendChild(dropdown);
+            
+            // Focus the dropdown
+            dropdown.focus();
+            
+            // Handle dropdown change
+            dropdown.onchange = function() {
+                if (this.value === 'CUSTOM') {
+                    // Remove the dropdown
+                    cell.removeChild(dropdown);
+                    
+                    // Make the cell editable with the original content
+                    cell.contentEditable = true;
+                    cell.textContent = currentValue;
+                    cell.focus();
+                    
+                    // Set up blur and key events for the editable cell
+                    setupEditableEvents(cell);
+                } else {
+                    // Set the cell text to the selected option
+                    cell.textContent = this.value;
+                    
+                    // Update the PDF table
+                    updatePdfTableWithEditedStatus();
+                }
+            };
+            
+            // Handle blur event for the dropdown
+            dropdown.onblur = function() {
+                // Set the cell text to the selected option
+                cell.textContent = this.value;
+                
+                // Update the PDF table
+                updatePdfTableWithEditedStatus();
+            };
+        }
+        
+        // Set up editable events for a cell
+        function setupEditableEvents(cell) {
             // Save the original content to restore if needed
             cell.dataset.originalContent = cell.textContent;
             
@@ -480,6 +593,24 @@
                 if (statusCell) {
                     statusCell.textContent = statusCells[i].textContent;
                 }
+            }
+        }
+        
+        // Update the PDF container with the current policy status
+        function updatePdfContainerPolicyStatus() {
+            const policyStatus = document.getElementById('policyStatus').value;
+            const policyStatusText = document.getElementById('policyStatus').options[document.getElementById('policyStatus').selectedIndex].text;
+            
+            // Update the policy status text in the PDF
+            document.getElementById('pdf-policy-status').textContent = policyStatusText;
+            
+            // Update the balance amount color based on policy status
+            const balanceElement = document.getElementById('pdf-balance');
+            
+            if (policyStatus === 'lapsed') {
+                balanceElement.classList.add('lapsed-balance');
+            } else {
+                balanceElement.classList.remove('lapsed-balance');
             }
         }
 
@@ -615,6 +746,8 @@
             const periodPremium = parseFloat(document.getElementById('premiumAmount').value) || 0; // This is now per period
             const modeOfPayment = document.getElementById('modeOfPayment').value;
             const currentDate = new Date(document.getElementById('currentDate').value);
+            const policyStatus = document.getElementById('policyStatus').value;
+            const policyStatusText = document.getElementById('policyStatus').options[document.getElementById('policyStatus').selectedIndex].text;
 
             // Validate inputs
             if (!policyAnniversary || !periodPremium || !totalPaid) {
@@ -877,6 +1010,9 @@
                     <div class="summary-row">
                         <div class="summary-label"><strong>Policy Anniversary:</strong> ${formatDisplayDate(policyAnniversary)}</div>
                     </div>
+                    <div class="summary-row">
+                        <div class="summary-label"><strong>Policy Status:</strong> ${policyStatusText}</div>
+                    </div>
                 </div>
                 
                 <table>
@@ -920,11 +1056,11 @@
             document.getElementById('output').innerHTML = output;
             
             // Also update the PDF container with the data
-            updatePdfContainer(clientName, planName, policyNo, policyAnniversary, totalPaid, totalBalance, coveragePeriods, currentDate);
+            updatePdfContainer(clientName, planName, policyNo, policyAnniversary, totalPaid, totalBalance, coveragePeriods, currentDate, policyStatus, policyStatusText);
         }
         
         // Function to update the PDF container with data
-function updatePdfContainer(clientName, planName, policyNo, policyAnniversary, totalPaid, totalBalance, coveragePeriods, currentDate) {
+function updatePdfContainer(clientName, planName, policyNo, policyAnniversary, totalPaid, totalBalance, coveragePeriods, currentDate, policyStatus, policyStatusText) {
     // Set header image based on selection
     const headerImageSource = document.getElementById('headerImageSource').value;
     let headerImageUrl;
@@ -953,10 +1089,20 @@ function updatePdfContainer(clientName, planName, policyNo, policyAnniversary, t
     document.getElementById('pdf-plan').textContent = planName;
     document.getElementById('pdf-policy-no').textContent = policyNo;
     document.getElementById('pdf-anniversary').textContent = formatAnniversaryDate(policyAnniversary);
+    document.getElementById('pdf-policy-status').textContent = policyStatusText;
     
     // Set payment info
     document.getElementById('pdf-total-paid').textContent = `PHP ${totalPaid.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-    document.getElementById('pdf-balance').textContent = `PHP ${totalBalance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    
+    // Set balance amount and apply red color if policy is lapsed
+    const balanceElement = document.getElementById('pdf-balance');
+    balanceElement.textContent = `PHP ${totalBalance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    
+    if (policyStatus === 'lapsed') {
+        balanceElement.classList.add('lapsed-balance');
+    } else {
+        balanceElement.classList.remove('lapsed-balance');
+    }
     
     // Set table rows
     const tableBody = document.getElementById('pdf-table-body');
